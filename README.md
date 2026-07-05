@@ -1,0 +1,92 @@
+# SchemaSay
+
+SchemaSay is a natural language analytics platform that enables non-technical users to query databases using plain English. The platform retrieves database schemas, constructs context-aware LLM prompts, generates secure SQL statements, executes them on the target database, and returns dynamic visualizations alongside business insights.
+
+## Core Architecture
+
+The system is structured as an analytics pipeline:
+
+1. User Input -> Natural language question is submitted.
+2. Introspection -> Active database schema is retrieved and formatted as LLM context.
+3. Prompt Generation -> Prompt containing database structure, constraints, and user question is built.
+4. AI generation -> LLM generates a read-only SQL query.
+5. SQL Validation -> Query is scanned to block destructive statements, stacked commands, and dangerous functions.
+6. Execution -> Query runs against the database with strict timeouts.
+7. Visualization -> Data schema is analyzed to select and render the appropriate Plotly chart.
+8. AI Insights -> Second LLM stage interprets results and generates a natural language business summary.
+
+## Technology Stack
+
+- **Backend:** FastAPI, Python, SQLAlchemy ORM, Alembic migrations
+- **Frontend:** Streamlit, Plotly Express
+- **AI Engine:** OpenAI API (GPT-4) / Gemini API
+- **Database:** PostgreSQL (platform metadata)
+- **Security:** JWT Auth, bcrypt password hashing, Fernet symmetric credential encryption, SQL validator
+
+## Repository Structure
+
+```
+schemasay/
+├── backend/                  # FastAPI backend application
+│   ├── app/
+│   │   ├── api/              # Route handlers
+│   │   ├── core/             # Business logic (auth, execution, schema introspection, AI)
+│   │   ├── models/           # ORM models (SQLAlchemy)
+│   │   ├── schemas/          # Pydantic schemas
+│   │   └── utils/            # General helpers
+│   └── requirements.txt
+└── frontend/                 # Streamlit frontend application
+    ├── app.py                # UI entry point
+    ├── api_client.py         # HTTP client wrapper
+    └── requirements.txt
+```
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.10 or higher
+- Docker and Docker Compose
+- OpenAI API Key
+
+### Local Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/schemasay.git
+   cd schemasay
+   ```
+
+2. Set up environment variables:
+   Copy `.env.example` to `.env` and fill in your configuration keys:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Start the PostgreSQL database:
+   ```bash
+   docker compose up -d
+   ```
+
+4. Set up the backend:
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # On Windows use: venv\Scripts\activate
+   pip install -r requirements.txt
+   uvicorn app.main:app --reload
+   ```
+
+5. Set up the frontend:
+   Open a new terminal window and navigate to the frontend directory:
+   ```bash
+   cd frontend
+   python -m venv venv
+   source venv/bin/activate  # On Windows use: venv\Scripts\activate
+   pip install -r requirements.txt
+   streamlit run app.py
+   ```
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.

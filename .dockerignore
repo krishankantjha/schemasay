@@ -1,0 +1,32 @@
+# Ignore git metadata
+.git/
+.gitignore
+
+# Ignore local environment files
+.env
+.env.example
+.env.*
+
+# Ignore Python dependencies and virtual environments
+venv/
+.venv/
+env/
+.env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore build directories
+dist/
+build/
+*.egg-info/
+
+# Ignore local databases and IDE configs
+*.db
+*.sqlite
+*.sqlite3
+.vscode/
+.idea/
+README.md
+LICENSE
