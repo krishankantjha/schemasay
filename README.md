@@ -87,6 +87,24 @@ schemasay/
    streamlit run app.py
    ```
 
+### Database Migrations
+
+Initialize and update your PostgreSQL database schemas using Alembic:
+```bash
+cd backend
+# Apply migrations to local PostgreSQL database
+venv\Scripts\alembic upgrade head
+```
+
+### Running the Test Suite
+
+Validate authentication security, token rotation, and brute-force lockout states using the automated test suite:
+```bash
+cd backend
+# Execute isolated, in-memory SQLite integration test cases
+..\venv\Scripts\pytest tests/
+```
+
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
