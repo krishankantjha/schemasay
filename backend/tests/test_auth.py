@@ -188,7 +188,7 @@ def test_refresh_token_rotation(client, db):
     # Try using old refresh token again (should fail as revoked)
     reuse_res = client.post("/api/v1/auth/refresh", json={"refresh_token": old_refresh})
     assert reuse_res.status_code == status.HTTP_401_UNAUTHORIZED
-    assert reuse_res.json()["detail"] == "Invalid or expired refresh token"
+    assert "Session compromise detected" in reuse_res.json()["detail"]
 
 def test_logout_revokes_token(client):
     """

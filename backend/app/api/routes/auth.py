@@ -165,10 +165,21 @@ def refresh(payload: TokenRefreshRequest, db: Session = Depends(get_db)):
     db_token = db.query(RefreshToken).filter(RefreshToken.token == payload.refresh_token).first()
     
     # Verify token existence, status, and expiration
-    if not db_token or db_token.revoked:
+    if not db_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired refresh token"
+        )
+        
+    if db_token.revoked:
+        # Security Event: Token reuse detected. Revoke all active refresh tokens for this user.
+        db.query(RefreshToken).filter(
+            RefreshToken.user_id == db_token.user_id
+        ).update({"revoked": True})
+        db.commit()
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Security warning: Session compromise detected. Please log in again."
         )
         
     expires_at_utc = db_token.expires_at.replace(tzinfo=timezone.utc) if db_token.expires_at.tzinfo is None else db_token.expires_at
