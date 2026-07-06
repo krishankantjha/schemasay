@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.api.routes import auth
+from app.api.routes import auth, connections
 
 # Initialize structured logging
 logging.basicConfig(
@@ -52,6 +52,7 @@ def global_exception_handler(request: Request, exc: Exception):
 
 # Register routers with API versioning
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(connections.router, prefix="/api/v1")
 
 @app.get("/")
 def read_root():
