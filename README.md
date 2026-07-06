@@ -98,7 +98,7 @@ venv\Scripts\alembic upgrade head
 
 ### Running the Test Suite
 
-Validate authentication security, token rotation, and brute-force lockout states using the automated test suite:
+Validate authentication security, token rotation, brute-force lockouts, symmetric database credential encryption, and spreadsheet file ingestion pipelines using the automated test suite:
 ```bash
 cd backend
 # Execute isolated, in-memory SQLite integration test cases
