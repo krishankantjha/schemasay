@@ -68,4 +68,51 @@ class APIClient:
         headers = {"Authorization": f"Bearer {token}"}
         return requests.get(f"{self.base_url}/api/v1/auth/me", headers=headers)
 
+    # --- Connection Module Handlers (Phase 2) ---
+
+    def get_connections(self, token: str) -> requests.Response:
+        """
+        Queries and lists all database connection metadata records configured by the active user.
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        return requests.get(f"{self.base_url}/api/v1/connections/", headers=headers)
+
+    def create_connection(self, token: str, payload: dict) -> requests.Response:
+        """
+        Registers a new database connection configuration (encrypts password on backend).
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        return requests.post(f"{self.base_url}/api/v1/connections/", json=payload, headers=headers)
+
+    def upload_file_connection(self, token: str, name: str, file_name: str, file_bytes: bytes) -> requests.Response:
+        """
+        Ingests an uploaded CSV/Excel spreadsheet, loads it into a SQLite table,
+        and registers a SQLite database connection record.
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        files = {"file": (file_name, file_bytes, "application/octet-stream")}
+        data = {"name": name}
+        return requests.post(f"{self.base_url}/api/v1/connections/upload", files=files, data=data, headers=headers)
+
+    def delete_connection(self, token: str, connection_id: int) -> requests.Response:
+        """
+        Deletes a database connection record and cleanses any local spreadsheet files.
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        return requests.delete(f"{self.base_url}/api/v1/connections/{connection_id}", headers=headers)
+
+    def test_connection(self, token: str, payload: dict) -> requests.Response:
+        """
+        Tests database connection parameters before saving them.
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        return requests.post(f"{self.base_url}/api/v1/connections/test", json=payload, headers=headers)
+
+    def get_query_history(self, token: str) -> requests.Response:
+        """
+        Retrieves user's query execution audit history logs.
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        return requests.get(f"{self.base_url}/api/v1/connections/history", headers=headers)
+
 api_client = APIClient()
