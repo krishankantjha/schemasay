@@ -1,0 +1,142 @@
+import threading
+import logging
+from typing import Dict
+from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine, URL
+from app.models.connection import DatabaseConnection
+from app.core.connections.encryptor import decrypt_password
+
+logger = logging.getLogger("schemasay.pool")
+
+class EngineRegistry:
+    """
+    Thread-safe registry caching database connection engines by connection ID.
+    Reuses connection pools across requests to prevent pool exhaustion and latency.
+    """
+    _instance = None
+    _lock = threading.Lock()
+
+    def __new__(cls, *args, **kwargs):
+        with cls._lock:
+            if not cls._instance:
+                cls._instance = super(EngineRegistry, cls).__new__(cls, *args, **kwargs)
+                cls._instance._engines = {}
+                cls._instance._registry_lock = threading.Lock()
+            return cls._instance
+
+    def get_connection_url(self, record: DatabaseConnection) -> URL:
+        """
+        Constructs a secure SQLAlchemy URL object, ensuring passwords are automatically
+        masked in logs and output structures.
+        """
+        db_type = record.db_type.lower()
+        password = decrypt_password(record.encrypted_password) if record.encrypted_password else ""
+
+        if db_type == "postgresql":
+            return URL.create(
+                drivername="postgresql",
+                username=record.username,
+                password=password,
+                host=record.host,
+                port=record.port,
+                database=record.database_name
+            )
+        elif db_type == "mysql":
+            return URL.create(
+                drivername="mysql+pymysql",
+                username=record.username,
+                password=password,
+                host=record.host,
+                port=record.port,
+                database=record.database_name
+            )
+        elif db_type == "mssql":
+            return URL.create(
+                drivername="mssql+pymssql",
+                username=record.username,
+                password=password,
+                host=record.host,
+                port=record.port,
+                database=record.database_name
+            )
+        elif db_type in ["sqlite", "file_upload"]:
+            return URL.create(
+                drivername="sqlite",
+                database=record.database_name
+            )
+        else:
+            raise ValueError(f"Unsupported database connection type: {db_type}")
+
+    def get_engine(self, record: DatabaseConnection) -> Engine:
+        """
+        Retrieves a cached Engine instance, or instantiates it with thread-safe locking
+        and configured connection pool limits.
+        """
+        connection_id = record.id
+        
+        # Fast path: engine already cached
+        if connection_id in self._engines:
+            return self._engines[connection_id]
+
+        # Slow path: instantiate and cache engine with double-checked locking
+        with self._registry_lock:
+            if connection_id in self._engines:
+                return self._engines[connection_id]
+
+            url = self.get_connection_url(record)
+            logger.info(f"Connection URL generated: {url}")
+            db_type_lower = record.db_type.lower()
+
+            try:
+                if db_type_lower in ["sqlite", "file_upload"]:
+                    # SQLite engines do not support pool_size and max_overflow parameters
+                    engine = create_engine(
+                        url,
+                        connect_args={"check_same_thread": False}
+                    )
+                else:
+                    # Configure production pool sizing limits
+                    engine = create_engine(
+                        url,
+                        pool_size=10,
+                        max_overflow=5,
+                        pool_recycle=1800,
+                        pool_pre_ping=True
+                    )
+                
+                self._engines[connection_id] = engine
+                logger.info(f"Successfully cached new connection engine pool for connection ID: {connection_id}")
+                return engine
+            except Exception as e:
+                logger.error(f"Failed to instantiate connection engine pool for connection ID {connection_id}: {str(e)}")
+                raise
+
+    def remove_engine(self, connection_id: int) -> None:
+        """
+        Disposes of the cached connection pool and cleans the registry mapping.
+        """
+        with self._registry_lock:
+            if connection_id in self._engines:
+                try:
+                    self._engines[connection_id].dispose()
+                    logger.info(f"Successfully disposed cached connection engine pool for connection ID: {connection_id}")
+                except Exception as e:
+                    logger.error(f"Error disposing connection engine pool for connection ID {connection_id}: {str(e)}")
+                finally:
+                    del self._engines[connection_id]
+
+    def clear(self) -> None:
+        """
+        Disposes of and clears all cached connection engine pools.
+        """
+        with self._registry_lock:
+            for connection_id in list(self._engines.keys()):
+                try:
+                    self._engines[connection_id].dispose()
+                    logger.info(f"Successfully cleared and disposed engine for connection ID: {connection_id}")
+                except Exception:
+                    pass
+            self._engines.clear()
+
+# Global singleton connection engine registry
+engine_registry = EngineRegistry()

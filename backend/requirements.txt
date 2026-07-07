@@ -15,3 +15,5 @@ httpx
 email-validator
 pymssql
 pymysql
+sqlglot
+

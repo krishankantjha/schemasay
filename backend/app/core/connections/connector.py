@@ -9,12 +9,21 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from app.models.connection import DatabaseConnection
 from app.core.connections.encryptor import decrypt_password
+from app.core.connections.pool import engine_registry
 
 logger = logging.getLogger("schemasay.connector")
 
 # Setup base directory for local SQLite spreadsheet uploads
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 DATA_DIR = os.path.join(BASE_DIR, "data")
+
+def sanitize_error_message(msg: str) -> str:
+    """
+    Regex-masks plaintext credentials and urls inside database driver exceptions.
+    """
+    # Matches db_type://user:password@host:port/db or similar
+    pattern = r'[a-zA-Z0-9\+\-_]+://[^/]+@'
+    return re.sub(pattern, '***://***@', msg)
 
 def get_connection_string(db_type: str, host: str, port: int, username: str, password: str, database_name: str) -> str:
     """
@@ -36,38 +45,20 @@ def get_connection_string(db_type: str, host: str, port: int, username: str, pas
 
 def get_connection(record: DatabaseConnection) -> Engine:
     """
-    Instantiates and returns a SQLAlchemy connection Engine for a saved connection record.
+    Retrieves the cached connection engine from the thread-safe global registry.
     """
-    password = decrypt_password(record.encrypted_password) if record.encrypted_password else ""
-    url = get_connection_string(
-        db_type=record.db_type,
-        host=record.host or "",
-        port=record.port or 0,
-        username=record.username or "",
-        password=password,
-        database_name=record.database_name
-    )
-    
-    # Configure SQLite-specific connection parameters for thread safety
-    if record.db_type.lower() in ["sqlite", "file_upload"]:
-        return create_engine(url, connect_args={"check_same_thread": False})
-    
-    return create_engine(url)
+    return engine_registry.get_engine(record)
 
 def dispose_connection_engine(record: DatabaseConnection) -> None:
     """
-    Disposes of the connection engine pool to release all active sockets/file locks.
+    Safely disposes of and ejects the target connection pool from the cache registry.
     """
-    try:
-        engine = get_connection(record)
-        engine.dispose()
-    except Exception:
-        pass
+    engine_registry.remove_engine(record.id)
 
 def test_connection(db_type: str, host: str, port: int, username: str, password: str, database_name: str) -> Tuple[bool, str]:
     """
     Attempts to establish a live connection to check credentials and network routing.
-    Returns (True, "") on success, or (False, error_message) on failure.
+    Returns (True, "") on success, or (False, sanitized_error_message) on failure.
     """
     try:
         url = get_connection_string(
@@ -101,8 +92,9 @@ def test_connection(db_type: str, host: str, port: int, username: str, password:
             
         return True, ""
     except Exception as e:
-        logger.error(f"Database connection test failed for {db_type}: {str(e)}", exc_info=True)
-        return False, str(e)
+        error_msg = sanitize_error_message(str(e))
+        logger.error(f"Database connection test failed for {db_type}: {error_msg}")
+        return False, error_msg
 
 def process_file_upload(file_name: str, file_content: bytes) -> Tuple[str, str]:
     """

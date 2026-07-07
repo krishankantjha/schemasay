@@ -1,15 +1,19 @@
 import os
+import logging
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
+logger = logging.getLogger("schemasay.connections")
+
 from app.database import get_db
 from app.models.user import User
-from app.models.connection import DatabaseConnection, QueryAuditLog
+from app.models.connection import DatabaseConnection, QueryAuditLog, DatabaseSchemaCache
 from app.schemas.connection import ConnectionCreate, ConnectionResponse, ConnectionTest, AuditLogResponse
 from app.api.routes.auth import get_current_user
 from app.core.connections.encryptor import encrypt_password
-from app.core.connections.connector import test_connection, process_file_upload, dispose_connection_engine
+from app.core.connections.connector import test_connection, process_file_upload, dispose_connection_engine, get_connection
+from app.core.schema.introspector import reflect_database_schema
 
 router = APIRouter(prefix="/connections", tags=["Database Connections"])
 
@@ -70,6 +74,27 @@ def create_connection(payload: ConnectionCreate, db: Session = Depends(get_db), 
     db.add(db_connection)
     db.commit()
     db.refresh(db_connection)
+    
+    # Auto-sync schema cache on database connection registration
+    try:
+        engine = get_connection(db_connection)
+        metadata_list = reflect_database_schema(engine)
+        cache_entries = [
+            DatabaseSchemaCache(
+                connection_id=db_connection.id,
+                table_name=entry["table_name"],
+                column_name=entry["column_name"],
+                data_type=entry["data_type"]
+            )
+            for entry in metadata_list
+        ]
+        logger.info(f"Auto-sync cached {len(cache_entries)} columns for connection ID: {db_connection.id}")
+        db.bulk_save_objects(cache_entries)
+        db.commit()
+        dispose_connection_engine(db_connection)
+    except Exception as e:
+        logger.error(f"Auto-sync failed on database connection registration: {str(e)}", exc_info=True)
+
     return db_connection
 
 @router.post("/upload", response_model=ConnectionResponse, status_code=status.HTTP_201_CREATED)
@@ -115,6 +140,26 @@ def upload_file_connection(
     db.add(db_connection)
     db.commit()
     db.refresh(db_connection)
+    
+    # Auto-sync schema cache on spreadsheet file uploads ingestion
+    try:
+        engine = get_connection(db_connection)
+        metadata_list = reflect_database_schema(engine)
+        cache_entries = [
+            DatabaseSchemaCache(
+                connection_id=db_connection.id,
+                table_name=entry["table_name"],
+                column_name=entry["column_name"],
+                data_type=entry["data_type"]
+            )
+            for entry in metadata_list
+        ]
+        db.bulk_save_objects(cache_entries)
+        db.commit()
+        dispose_connection_engine(db_connection)
+    except Exception as e:
+        logger.error(f"Auto-sync failed on file upload ingestion: {str(e)}", exc_info=True)
+
     return db_connection
 
 @router.get("/", response_model=List[ConnectionResponse])
@@ -141,10 +186,10 @@ def delete_connection(connection_id: int, db: Session = Depends(get_db), current
         )
         
     # Cleanse local disk files if connection type was a spreadsheet upload
-    if connection.db_type == "file_upload":
+    if connection.db_type in ["sqlite", "file_upload"]:
         # Dispose of connection engine to release file locks on Windows
         dispose_connection_engine(connection)
-        if os.path.exists(connection.database_name):
+        if connection.db_type == "file_upload" and os.path.exists(connection.database_name):
             try:
                 os.remove(connection.database_name)
             except Exception:
@@ -155,10 +200,20 @@ def delete_connection(connection_id: int, db: Session = Depends(get_db), current
     return {"message": "Database connection successfully deleted"}
 
 @router.get("/history", response_model=List[AuditLogResponse])
-def get_query_history(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def get_query_history(
+    page: int = 1,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """
-    Retrieves the chronological query execution history logs for the active user.
+    Retrieves the paginated query execution history logs for the active user.
     """
+    page_val = max(1, page)
+    limit_val = max(1, min(100, limit))  # Enforce client request caps
+    
     return db.query(QueryAuditLog).filter(
         QueryAuditLog.user_id == current_user.id
-    ).order_by(QueryAuditLog.created_at.desc()).all()
+    ).order_by(
+        QueryAuditLog.created_at.desc()
+    ).offset((page_val - 1) * limit_val).limit(limit_val).all()
