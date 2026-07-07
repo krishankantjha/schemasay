@@ -10,8 +10,8 @@ The system is structured as an analytics pipeline:
 2. Introspection -> Active database schema is retrieved and formatted as LLM context.
 3. Prompt Generation -> Prompt containing database structure, constraints, and user question is built.
 4. AI generation -> LLM generates a read-only SQL query.
-5. SQL Validation -> Query is scanned to block destructive statements, stacked commands, and dangerous functions.
-6. Execution -> Query runs against the database with strict timeouts.
+5. SQL Validation -> Query is scanned using `sqlglot` AST parsing to block destructive statements, stacked commands, UNION exfiltration, and dangerous utility calls.
+6. Execution -> Query runs against the target database via a pooled engine cache with strict 30-second timeouts.
 7. Visualization -> Data schema is analyzed to select and render the appropriate Plotly chart.
 8. AI Insights -> Second LLM stage interprets results and generates a natural language business summary.
 
@@ -19,9 +19,9 @@ The system is structured as an analytics pipeline:
 
 - **Backend:** FastAPI, Python, SQLAlchemy ORM, Alembic migrations
 - **Frontend:** Streamlit, Plotly Express
-- **AI Engine:** OpenAI API (GPT-4) / Gemini API
+- **AI Engine:** OpenAI API (GPT-4) / Gemini API (GPT compatibility layer)
 - **Database:** PostgreSQL (platform metadata)
-- **Security:** JWT Auth, bcrypt password hashing, Fernet symmetric credential encryption, SQL validator
+- **Security:** JWT Auth, bcrypt password hashing, Fernet symmetric credential encryption, AST-based `sqlglot` read-only filter, connection pooling caching registries, and output row limit guards
 
 ## Repository Structure
 
@@ -100,9 +100,8 @@ venv\Scripts\alembic upgrade head
 
 Validate authentication security, token rotation, brute-force lockouts, symmetric database credential encryption, and spreadsheet file ingestion pipelines using the automated test suite:
 ```bash
-cd backend
 # Execute isolated, in-memory SQLite integration test cases
-..\venv\Scripts\pytest tests/
+venv\Scripts\pytest backend/tests/
 ```
 
 ## License
