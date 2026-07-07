@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
@@ -9,6 +9,7 @@ from app.models.connection import DatabaseConnection, DatabaseSchemaCache
 from app.api.routes.auth import get_current_user
 from app.core.ai.query_generator import generate_sql_from_question
 from app.core.ai.executor import execute_assistant_query
+from app.core.visualization.chart_service import select_chart_type, ChartConfig
 
 router = APIRouter(prefix="/assistant", tags=["AI Copilot & SQL Workbench"])
 
@@ -39,6 +40,7 @@ class QueryResponse(BaseModel):
     error: Optional[str]
     results: Optional[List[Dict]]
     execution_duration_ms: float
+    chart_config: ChartConfig = Field(default_factory=ChartConfig)
 
 # --- Helper Functions ---
 
@@ -116,18 +118,29 @@ def query_database_with_assistant(
                 status_code=status.HTTP_408_REQUEST_TIMEOUT,
                 detail=error_or_sql
             )
+        # Map user schema errors or SQL syntax invalid execution queries to 422 Unprocessable Content
+        if "Database Error" in error_or_sql or "syntax error" in error_or_sql.lower():
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=error_or_sql
+            )
         # Map general database execution failures to 502 Bad Gateway
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=error_or_sql
         )
 
+    rows = results or []
+    columns = list(rows[0].keys()) if rows else []
+    chart_config = select_chart_type(columns, rows, payload.question)
+
     return QueryResponse(
         sql=generated_sql,
         success=True,
         error=None,
         results=results,
-        execution_duration_ms=duration_ms
+        execution_duration_ms=duration_ms,
+        chart_config=chart_config
     )
 
 @router.post("/execute-raw", response_model=QueryResponse, status_code=status.HTTP_200_OK)
@@ -164,16 +177,27 @@ def execute_raw_sql_query(
                 status_code=status.HTTP_408_REQUEST_TIMEOUT,
                 detail=error_or_sql
             )
+        # Map user schema errors or SQL syntax invalid execution queries to 422 Unprocessable Content
+        if "Database Error" in error_or_sql or "syntax error" in error_or_sql.lower():
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=error_or_sql
+            )
         # Map general database execution failures to 502 Bad Gateway
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=error_or_sql
         )
 
+    rows = results or []
+    columns = list(rows[0].keys()) if rows else []
+    chart_config = select_chart_type(columns, rows, payload.sql_query)
+
     return QueryResponse(
         sql=payload.sql_query,
         success=True,
         error=None,
         results=results,
-        execution_duration_ms=duration_ms
+        execution_duration_ms=duration_ms,
+        chart_config=chart_config
     )
