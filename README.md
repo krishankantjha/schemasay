@@ -2,26 +2,40 @@
 
 SchemaSay is a natural language analytics platform that enables non-technical users to query databases using plain English. The platform retrieves database schemas, constructs context-aware LLM prompts, generates secure SQL statements, executes them on the target database, and returns dynamic visualizations alongside business insights.
 
-## Core Architecture
+## Core Architecture & Hardening Features
 
-The system is structured as an analytics pipeline:
+The system is structured as an enterprise-grade analytics pipeline:
 
-1. User Input -> Natural language question is submitted.
-2. Introspection -> Active database schema is retrieved and formatted as LLM context.
-3. Prompt Generation -> Prompt containing database structure, constraints, and user question is built.
-4. AI generation -> LLM generates a read-only SQL query.
-5. SQL Validation -> Query is scanned using `sqlglot` AST parsing to block destructive statements, stacked commands, UNION exfiltration, and dangerous utility calls.
-6. Execution -> Query runs against the target database via a pooled engine cache with strict 30-second timeouts.
-7. Visualization -> Data schema is analyzed to select and render the appropriate Plotly chart.
-8. AI Insights -> Second LLM stage interprets results and generates a natural language business summary.
+1. **User Input:** Natural language question is submitted.
+2. **Introspection:** Active database schema is retrieved and formatted as LLM context.
+3. **Prompt Generation:** Prompt containing database structure, constraints, and user question is built.
+4. **AI Generation:** LLM generates a read-only SQL query.
+5. **SQL Sandbox Validation:** Query is scanned using `sqlglot` AST parsing to block:
+   * Destructive statements (`INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, `TRUNCATE`).
+   * Stacked commands (semicolon query injections).
+   * UNION exfiltration routes.
+   * CTE write bypasses (`WITH ... INSERT/DELETE`) and `SELECT INTO` nodes.
+   * Blind SQL injection timing vectors (`pg_sleep()`, `sleep()`, `WAITFOR`).
+6. **Execution Engine:** Query runs asynchronously against the target database via:
+   * Thread-safe execution pools (`run_in_threadpool`).
+   * Strict 30-second timeouts enforced across dialects (PostgreSQL, MSSQL, MySQL, and C-level SQLite progress handlers).
+   * Resource-capping registries using LRU connection pool eviction (strictly limited to 50 active engines).
+   * Secured error masking (suppresses driver details, returning formatted generic feedback).
+   * Request rate limiting (30 requests/minute per host).
+7. **Visualization:** Evaluates DataFrame types to configure Plotly charts:
+   * Handles nulls, mixed formats, non-ISO dates (`DD-MM-YYYY`, `MM/DD/YYYY`), Unix timestamps, and timezone-aware datetimes.
+   * Sanitizes all columns, axes, and titles to protect against DOM XSS vectors.
+   * Aggregates duplicate date series and sorts chronological inputs.
+   * Enforces 5,000-row sampling limits and 15-category color thresholds to prevent browser locks.
+8. **AI Insights:** Second LLM stage interprets results and generates a natural language business summary.
 
 ## Technology Stack
 
-- **Backend:** FastAPI, Python, SQLAlchemy ORM, Alembic migrations
+- **Backend:** FastAPI, Python, SQLAlchemy ORM, Alembic migrations, Pandas, Numpy, SQLGlot
 - **Frontend:** Streamlit, Plotly Express
 - **AI Engine:** OpenAI API (GPT-4) / Gemini API (GPT compatibility layer)
 - **Database:** PostgreSQL (platform metadata)
-- **Security:** JWT Auth, bcrypt password hashing, Fernet symmetric credential encryption, AST-based `sqlglot` read-only filter, connection pooling caching registries, and output row limit guards
+- **Security:** JWT Auth with tokens rotation, bcrypt hashing, Fernet symmetric credential encryption, AST-based `sqlglot` read-only sandboxes, rate-limit gates, connection pool evictions, and DOM XSS sanitizers
 
 ## Repository Structure
 
