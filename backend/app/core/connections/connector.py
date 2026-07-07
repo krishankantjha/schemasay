@@ -6,7 +6,7 @@ import logging
 from typing import Tuple
 import pandas as pd
 from sqlalchemy import create_engine, text
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Engine, URL
 from app.models.connection import DatabaseConnection
 from app.core.connections.encryptor import decrypt_password
 from app.core.connections.pool import engine_registry
@@ -25,23 +25,53 @@ def sanitize_error_message(msg: str) -> str:
     pattern = r'[a-zA-Z0-9\+\-_]+://[^/]+@'
     return re.sub(pattern, '***://***@', msg)
 
-def get_connection_string(db_type: str, host: str, port: int, username: str, password: str, database_name: str) -> str:
+def get_connection_url(db_type: str, host: str, port: int, username: str, password: str, database_name: str) -> URL:
     """
-    Constructs the appropriate SQLAlchemy connection string based on database type.
+    Constructs the appropriate SQLAlchemy URL object based on database type.
     """
     db_type = db_type.lower()
     
     if db_type == "postgresql":
-        return f"postgresql://{username}:{password}@{host}:{port}/{database_name}"
+        return URL.create(
+            drivername="postgresql",
+            username=username,
+            password=password,
+            host=host,
+            port=port,
+            database=database_name
+        )
     elif db_type == "mysql":
-        return f"mysql+pymysql://{username}:{password}@{host}:{port}/{database_name}"
+        return URL.create(
+            drivername="mysql+pymysql",
+            username=username,
+            password=password,
+            host=host,
+            port=port,
+            database=database_name
+        )
     elif db_type == "mssql":
-        return f"mssql+pymssql://{username}:{password}@{host}:{port}/{database_name}"
+        return URL.create(
+            drivername="mssql+pymssql",
+            username=username,
+            password=password,
+            host=host,
+            port=port,
+            database=database_name
+        )
     elif db_type in ["sqlite", "file_upload"]:
         # SQLite uses database_name as the absolute local file path
-        return f"sqlite:///{database_name}"
+        return URL.create(
+            drivername="sqlite",
+            database=database_name
+        )
     else:
         raise ValueError(f"Unsupported database connection type: {db_type}")
+
+def get_connection_string(db_type: str, host: str, port: int, username: str, password: str, database_name: str) -> str:
+    """
+    Constructs the appropriate SQLAlchemy connection string based on database type (for backward compatibility).
+    """
+    return str(get_connection_url(db_type, host, port, username, password, database_name))
 
 def get_connection(record: DatabaseConnection) -> Engine:
     """
@@ -61,7 +91,7 @@ def test_connection(db_type: str, host: str, port: int, username: str, password:
     Returns (True, "") on success, or (False, sanitized_error_message) on failure.
     """
     try:
-        url = get_connection_string(
+        url = get_connection_url(
             db_type=db_type,
             host=host,
             port=port,

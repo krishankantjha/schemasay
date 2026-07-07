@@ -8,10 +8,13 @@ from app.core.connections.encryptor import decrypt_password
 
 logger = logging.getLogger("schemasay.pool")
 
+from collections import OrderedDict
+
 class EngineRegistry:
     """
     Thread-safe registry caching database connection engines by connection ID.
     Reuses connection pools across requests to prevent pool exhaustion and latency.
+    Enforces a Least Recently Used (LRU) eviction limit of 50 cached database pools.
     """
     _instance = None
     _lock = threading.Lock()
@@ -20,7 +23,8 @@ class EngineRegistry:
         with cls._lock:
             if not cls._instance:
                 cls._instance = super(EngineRegistry, cls).__new__(cls, *args, **kwargs)
-                cls._instance._engines = {}
+                cls._instance._engines = OrderedDict()
+                cls._instance._max_engines = 50
                 cls._instance._registry_lock = threading.Lock()
             return cls._instance
 
@@ -76,15 +80,18 @@ class EngineRegistry:
         
         # Fast path: engine already cached
         if connection_id in self._engines:
+            with self._registry_lock:
+                self._engines.move_to_end(connection_id)
             return self._engines[connection_id]
 
         # Slow path: instantiate and cache engine with double-checked locking
         with self._registry_lock:
             if connection_id in self._engines:
+                self._engines.move_to_end(connection_id)
                 return self._engines[connection_id]
 
             url = self.get_connection_url(record)
-            logger.info(f"Connection URL generated: {url}")
+            logger.info(f"Connection URL generated for connection ID: {connection_id}")
             db_type_lower = record.db_type.lower()
 
             try:
@@ -92,18 +99,37 @@ class EngineRegistry:
                     # SQLite engines do not support pool_size and max_overflow parameters
                     engine = create_engine(
                         url,
-                        connect_args={"check_same_thread": False}
+                        connect_args={"check_same_thread": False, "timeout": 30}
                     )
                 else:
+                    # Configure driver-specific parameters and timeouts (30 seconds query timeout)
+                    connect_args = {}
+                    if db_type_lower == "postgresql":
+                        connect_args = {"options": "-c statement_timeout=30000"}
+                    elif db_type_lower == "mysql":
+                        connect_args = {"connect_timeout": 10}
+                    elif db_type_lower == "mssql":
+                        connect_args = {"login_timeout": 10, "timeout": 30}
+
                     # Configure production pool sizing limits
                     engine = create_engine(
                         url,
                         pool_size=10,
                         max_overflow=5,
                         pool_recycle=1800,
-                        pool_pre_ping=True
+                        pool_pre_ping=True,
+                        connect_args=connect_args
                     )
                 
+                # Enforce LRU eviction if capacity limit is reached
+                if len(self._engines) >= self._max_engines:
+                    evicted_id, evicted_engine = self._engines.popitem(last=False)
+                    try:
+                        evicted_engine.dispose()
+                        logger.info(f"LRU Eviction: Disposed connection engine pool for connection ID: {evicted_id}")
+                    except Exception as ex:
+                        logger.error(f"Error disposing evicted connection pool for connection ID {evicted_id}: {str(ex)}")
+
                 self._engines[connection_id] = engine
                 logger.info(f"Successfully cached new connection engine pool for connection ID: {connection_id}")
                 return engine
@@ -140,3 +166,22 @@ class EngineRegistry:
 
 # Global singleton connection engine registry
 engine_registry = EngineRegistry()
+
+# Register event listener for query execution timeouts across SQLite engines
+import time
+from sqlalchemy import event
+
+@event.listens_for(Engine, "before_cursor_execute")
+def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    dialect_name = conn.dialect.name
+    if dialect_name == "sqlite":
+        dbapi_conn = conn.connection.dbapi_connection
+        if hasattr(dbapi_conn, "set_progress_handler"):
+            start_time = time.time()
+            def sqlite_progress_handler():
+                # If execution runs longer than 30 seconds, abort execution (raises OperationalError)
+                if time.time() - start_time > 30:
+                    return 1
+                return 0
+            # Set callback to be invoked every 100 instructions
+            dbapi_conn.set_progress_handler(sqlite_progress_handler, 100)
