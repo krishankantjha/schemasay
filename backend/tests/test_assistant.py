@@ -77,7 +77,10 @@ def test_ast_safety_filter_validation():
         "UPDATE accounts SET balance = 0",
         "ALTER TABLE users ADD COLUMN age INT",
         "TRUNCATE TABLE logs",
-        "MERGE INTO target USING source ON target.id = source.id WHEN MATCHED THEN UPDATE SET target.val = source.val"
+        "MERGE INTO target USING source ON target.id = source.id WHEN MATCHED THEN UPDATE SET target.val = source.val",
+        "WITH evil AS (INSERT INTO users (name) VALUES ('hacker') RETURNING id) SELECT * FROM evil",
+        "WITH evil AS (DELETE FROM orders WHERE id = 1) SELECT * FROM evil",
+        "SELECT * INTO new_table FROM users"
     ]
     for sql in mutations:
         is_ok, err = validate_sql_structure(sql)
@@ -88,6 +91,18 @@ def test_ast_safety_filter_validation():
     is_ok, err = validate_sql_structure("CALL my_procedure()")
     assert is_ok is False
     assert "Stored procedure or utility query commands are blocked" in err
+
+    # Test blocked timing attacks
+    timing_attacks = [
+        "SELECT pg_sleep(5)",
+        "SELECT sleep(10)",
+        "SELECT * FROM users WHERE id = 1 AND pg_sleep(5) = 1",
+        "WAITFOR DELAY '00:00:05'"
+    ]
+    for sql in timing_attacks:
+        is_ok, err = validate_sql_structure(sql)
+        assert is_ok is False
+        assert ("Timing" in err or "SQL Syntax Error" in err or "Access Denied" in err)
 
 def test_query_execution_and_telemetry_logging(client, db):
     """
@@ -154,7 +169,7 @@ def test_query_execution_and_telemetry_logging(client, db):
 
 def test_assistant_api_endpoints_security(client, db):
     """
-    Verifies that assistant query and execute-raw endpoints are protected by auth
+    Verifies that assistant query and raw query execution endpoints are protected by auth
     and reject unauthorized or unsafe actions with HTTP 400.
     """
     token = get_auth_token(client)
@@ -171,11 +186,11 @@ def test_assistant_api_endpoints_security(client, db):
     assert create_res.status_code == status.HTTP_201_CREATED
     connection_id = create_res.json()["id"]
 
-    # Test unauthorized query post
+    # 1. Test unauthorized query post
     unauth_res = client.post("/api/v1/assistant/query", json={"connection_id": connection_id, "question": "show me tables"})
     assert unauth_res.status_code == status.HTTP_401_UNAUTHORIZED
 
-    # Test safety failure response mapped to HTTP 400 Bad Request
+    # 2. Test safety failure response mapped to HTTP 400 Bad Request on execute-raw
     safety_fail_res = client.post(
         "/api/v1/assistant/execute-raw",
         json={"connection_id": connection_id, "sql_query": "DROP TABLE test_items"},
@@ -183,6 +198,33 @@ def test_assistant_api_endpoints_security(client, db):
     )
     assert safety_fail_res.status_code == status.HTTP_400_BAD_REQUEST
     assert "Unsafe mutating operation" in safety_fail_res.json()["detail"]
+
+    # 3. Test safety failure response mapped to HTTP 400 Bad Request on query/execute
+    safety_direct_fail_res = client.post(
+        "/api/v1/query/execute",
+        json={"connection_id": connection_id, "sql_query": "INSERT INTO users (name) VALUES ('hacker')"},
+        headers=headers
+    )
+    assert safety_direct_fail_res.status_code == status.HTTP_400_BAD_REQUEST
+    assert "Unsafe mutating operation" in safety_direct_fail_res.json()["detail"]
+
+    # 4. Test structured error parsing mapped to HTTP 422 Unprocessable Entity for table absence
+    err_res = client.post(
+        "/api/v1/query/execute",
+        json={"connection_id": connection_id, "sql_query": "SELECT * FROM non_existent_table"},
+        headers=headers
+    )
+    assert err_res.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "does not exist" in err_res.json()["detail"].lower()
+
+    # 5. Test sanitized fallback error message for general database execution errors
+    fallback_res = client.post(
+        "/api/v1/query/execute",
+        json={"connection_id": connection_id, "sql_query": "SELECT invalid_func()"},
+        headers=headers
+    )
+    assert fallback_res.status_code == status.HTTP_502_BAD_GATEWAY
+    assert "An unexpected database error occurred during query execution" in fallback_res.json()["detail"]
 
     # Cleanup connection
     client.delete(f"/api/v1/connections/{connection_id}", headers=headers)
