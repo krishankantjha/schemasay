@@ -53,3 +53,12 @@ def client(db):
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+@pytest.fixture(scope="function", autouse=True)
+def clear_connection_registry():
+    """
+    Clears the global connection engine registry before each test function
+    to prevent connection state leaks across tests.
+    """
+    from app.core.connections.pool import engine_registry
+    engine_registry.clear()

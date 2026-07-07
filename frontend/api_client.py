@@ -108,11 +108,46 @@ class APIClient:
         headers = {"Authorization": f"Bearer {token}"}
         return requests.post(f"{self.base_url}/api/v1/connections/test", json=payload, headers=headers)
 
-    def get_query_history(self, token: str) -> requests.Response:
+    def get_query_history(self, token: str, page: int = 1, limit: int = 100) -> requests.Response:
         """
-        Retrieves user's query execution audit history logs.
+        Retrieves user's query execution audit history logs (paginated).
         """
         headers = {"Authorization": f"Bearer {token}"}
-        return requests.get(f"{self.base_url}/api/v1/connections/history", headers=headers)
+        params = {"page": page, "limit": limit}
+        return requests.get(f"{self.base_url}/api/v1/connections/history", params=params, headers=headers)
+
+    # --- Schema Introspection Module Handlers (Phase 3) ---
+
+    def get_schema(self, token: str, connection_id: int) -> requests.Response:
+        """
+        Retrieves the cached schema metadata layout for a connection.
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        return requests.get(f"{self.base_url}/api/v1/schema/{connection_id}", headers=headers)
+
+    def sync_schema(self, token: str, connection_id: int) -> requests.Response:
+        """
+        Forces a manual database schema reflection and cache sync.
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        return requests.post(f"{self.base_url}/api/v1/schema/{connection_id}/sync", headers=headers)
+
+    # --- Query Assistant & SQL Workbench Module Handlers (Phase 4) ---
+
+    def query_assistant(self, token: str, connection_id: int, question: str) -> requests.Response:
+        """
+        Translates a natural language question into SQL, runs it, and returns results.
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        payload = {"connection_id": connection_id, "question": question}
+        return requests.post(f"{self.base_url}/api/v1/assistant/query", json=payload, headers=headers)
+
+    def execute_raw_sql(self, token: str, connection_id: int, sql_query: str) -> requests.Response:
+        """
+        Directly executes raw SQL Workbench queries in a secure sandbox.
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        payload = {"connection_id": connection_id, "sql_query": sql_query}
+        return requests.post(f"{self.base_url}/api/v1/assistant/execute-raw", json=payload, headers=headers)
 
 api_client = APIClient()

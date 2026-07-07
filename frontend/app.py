@@ -2,6 +2,7 @@ import streamlit as st
 from api_client import api_client
 from views.auth_view import show_auth_page
 from views.connect_view import show_connection_manager
+from views.query_view import show_query_assistant_panel
 
 st.set_page_config(
     page_title="SchemaSay",
@@ -39,6 +40,68 @@ else:
         )
         
         st.sidebar.markdown("---")
+        
+        # Active Database Source Selector
+        st.sidebar.write("### Database Source")
+        conn_response = api_client.get_connections(token)
+        if conn_response.status_code == 200:
+            connections = conn_response.json()
+            if not connections:
+                st.sidebar.info("No databases connected yet. Go to 'Database Connections' to add one.")
+                st.session_state["active_connection_id"] = None
+            else:
+                conn_options = {c["id"]: f"{c['name']} ({c['db_type'].upper()})" for c in connections}
+                conn_ids = list(conn_options.keys())
+                
+                # Check if session state holds a valid active connection, default to first item
+                current_active = st.session_state.get("active_connection_id")
+                default_idx = conn_ids.index(current_active) if current_active in conn_ids else 0
+                
+                selected_id = st.sidebar.selectbox(
+                    "Active Source",
+                    options=conn_ids,
+                    format_func=lambda x: conn_options[x],
+                    index=default_idx
+                )
+                st.session_state["active_connection_id"] = selected_id
+                
+                # Force resync schemas
+                if st.sidebar.button("Sync Schema", key="sync_schema_sidebar_btn"):
+                    with st.spinner("Reflecting database schema..."):
+                        sync_res = api_client.sync_schema(token, selected_id)
+                    if sync_res.status_code == 200:
+                        st.sidebar.success("Schema synchronized successfully!")
+                        st.rerun()
+                    else:
+                        st.sidebar.error("Failed to sync schema.")
+                
+                # Render Schema Explorer tree
+                st.sidebar.write("#### Schema Explorer")
+                schema_response = api_client.get_schema(token, selected_id)
+                if schema_response.status_code == 200:
+                    schema_cache = schema_response.json()
+                    if not schema_cache:
+                        st.sidebar.warning("Schema cache empty. Click 'Sync Schema' to reflect tables.")
+                    else:
+                        # Group columns by table name
+                        tables_map = {}
+                        for col in schema_cache:
+                            t_name = col["table_name"]
+                            if t_name not in tables_map:
+                                tables_map[t_name] = []
+                            tables_map[t_name].append(f"{col['column_name']} ({col['data_type']})")
+                        
+                        # Render each table in a collapsible expander
+                        for t_name, cols in tables_map.items():
+                            with st.sidebar.expander(f"Table: {t_name}"):
+                                for c_desc in cols:
+                                    st.write(f"- {c_desc}")
+                else:
+                    st.sidebar.error("Failed to load schema cache.")
+        else:
+            st.sidebar.error("Failed to load connections.")
+            
+        st.sidebar.markdown("---")
         # Logout handles local state and issues backend revocation
         if st.sidebar.button("Log Out"):
             with st.spinner("Logging out..."):
@@ -52,10 +115,7 @@ else:
         if page == "Database Connections":
             show_connection_manager()
         else:
-            # Query Assistant Home Dashboard Placeholder (implemented in later phases)
-            st.write(f"### Welcome back, {display_name}!")
-            st.write("You are successfully authenticated.")
-            st.info("Select 'Database Connections' in the sidebar menu to connect your external servers or upload CSV/Excel files.")
+            show_query_assistant_panel()
             
     elif response.status_code == 401 and "refresh_token" in st.session_state:
         # Access token expired, attempt to rotate credentials using refresh token

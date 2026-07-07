@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.api.routes import auth, connections
+from app.api.routes import auth, connections, schema, assistant
 
 # Initialize structured logging
 logging.basicConfig(
@@ -50,9 +50,10 @@ def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "An internal server error occurred."}
     )
 
-# Register routers with API versioning
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(connections.router, prefix="/api/v1")
+app.include_router(schema.router, prefix="/api/v1")
+app.include_router(assistant.router, prefix="/api/v1")
 
 @app.get("/")
 def read_root():
