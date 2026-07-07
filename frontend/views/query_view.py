@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from api_client import api_client
+from components.chart_renderer import render_chart
 
 def show_query_assistant_panel():
     """
@@ -79,8 +80,10 @@ def show_query_assistant_panel():
 
                     if data["success"]:
                         st.success(f"Success | Returned {len(data['results'])} rows in {data['execution_duration_ms']:.1f}ms")
-                        df = pd.DataFrame(data["results"])
-                        st.dataframe(df, use_container_width=True)
+                        results = data.get("results") or []
+                        columns = list(results[0].keys()) if results else []
+                        chart_config = data.get("chart_config") or {}
+                        render_chart(columns, results, chart_config)
                     else:
                         st.error(f"Failed | Error: {data['error']}")
                 else:
@@ -118,13 +121,13 @@ def show_query_assistant_panel():
 
                 if response.status_code == 200:
                     data = response.json()
+                    rows = data.get("rows") or []
+                    duration = data.get("execution_time_ms") or 0.0
+                    columns = data.get("columns") or []
+                    chart_config = data.get("chart_config") or {}
                     
-                    if data["success"]:
-                        st.success(f"Success | Returned {len(data['results'])} rows in {data['execution_duration_ms']:.1f}ms")
-                        df = pd.DataFrame(data["results"])
-                        st.dataframe(df, use_container_width=True)
-                    else:
-                        st.error(f"Failed | Error: {data['error']}")
+                    st.success(f"Success | Returned {len(rows)} rows in {duration:.1f}ms")
+                    render_chart(columns, rows, chart_config)
                 else:
                     # Capture and display detailed error message from backend safety rejections or database drivers
                     try:

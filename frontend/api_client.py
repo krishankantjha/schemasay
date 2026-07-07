@@ -144,10 +144,10 @@ class APIClient:
 
     def execute_raw_sql(self, token: str, connection_id: int, sql_query: str) -> requests.Response:
         """
-        Directly executes raw SQL Workbench queries in a secure sandbox.
+        Directly executes raw SQL Workbench queries using the dedicated execution engine.
         """
         headers = {"Authorization": f"Bearer {token}"}
         payload = {"connection_id": connection_id, "sql_query": sql_query}
-        return requests.post(f"{self.base_url}/api/v1/assistant/execute-raw", json=payload, headers=headers)
+        return requests.post(f"{self.base_url}/api/v1/query/execute", json=payload, headers=headers)
 
 api_client = APIClient()
