@@ -38,3 +38,5 @@ class InMemoryRateLimiter:
 # Rate limiting instances: 5 attempts per IP address per 60 seconds
 login_limiter = InMemoryRateLimiter(requests_limit=5, window_seconds=60)
 register_limiter = InMemoryRateLimiter(requests_limit=5, window_seconds=60)
+# Rate limiting instances: 30 attempts per IP address per 60 seconds
+query_limiter = InMemoryRateLimiter(requests_limit=30, window_seconds=60)
