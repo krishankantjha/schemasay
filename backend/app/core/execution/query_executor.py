@@ -28,11 +28,11 @@ def parse_database_exception(err: Exception, db_type: str) -> str:
     err_msg = str(err).lower()
     db_type = db_type.lower()
 
-    # 1. Timeout Check
+    # Timeout
     if any(x in err_msg for x in ["timeout", "canceling statement", "canceled", "timed out", "execution time exceeded", "interrupted", "query aborted"]):
         return "Query execution cancelled: The operation exceeded the 30-second time limit."
 
-    # 2. SQLite Error Mapping
+    # SQLite
     if db_type in ["sqlite", "file_upload"]:
         if "no such table" in err_msg:
             parts = str(err).split("no such table:")
@@ -45,7 +45,7 @@ def parse_database_exception(err: Exception, db_type: str) -> str:
         if "syntax error" in err_msg:
             return "Database Error: SQL syntax error. Please verify SELECT statement format."
 
-    # 3. PostgreSQL Error Mapping
+    # PostgreSQL
     elif db_type == "postgresql":
         if "relation" in err_msg and "does not exist" in err_msg:
             match = re.search(r'relation "([^"]+)" does not exist', str(err))
@@ -58,7 +58,7 @@ def parse_database_exception(err: Exception, db_type: str) -> str:
         if "syntax error at or near" in err_msg:
             return "Database Error: SQL syntax error near query keywords."
 
-    # 4. MySQL Error Mapping
+    # MySQL
     elif db_type == "mysql":
         if "table" in err_msg and "doesn't exist" in err_msg:
             match = re.search(r"table '([^']+)' doesn't exist", str(err))
@@ -69,7 +69,7 @@ def parse_database_exception(err: Exception, db_type: str) -> str:
             col = match.group(1) if match else "unknown"
             return f"Database Error: Column '{col}' does not exist on the target table."
 
-    # 5. Fallback message (Sanitized for security)
+    # Fallback (sanitized to prevent credential leakage)
     return "Database Execution Error: An unexpected database error occurred during query execution."
 
 def execute_query(
@@ -86,13 +86,13 @@ def execute_query(
     
     try:
         with engine.connect() as conn:
-            # 1. Enforce 30-second timeouts per dialect (commit removed to avoid session reset)
+            # Apply a 30-second statement timeout per dialect before executing the query
             if db_type_lower == "postgresql":
                 conn.execute(text("SET statement_timeout = 30000"))
             elif db_type_lower == "mysql":
                 conn.execute(text("SET max_execution_time = 30000"))
 
-            # Execute query and load results in chunks of 2000 rows to prevent driver buffer bloat
+            # Load results in chunks to avoid loading the entire result set into memory at once
             chunks = pd.read_sql_query(sql_query, conn, chunksize=2000)
             df_list = []
             for chunk in chunks:

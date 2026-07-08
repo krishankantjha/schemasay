@@ -7,7 +7,7 @@ from app.config import settings
 
 logger = logging.getLogger("schemasay.generator")
 
-# Cache OpenAI SDK clients globally to prevent thread pool connection leaks
+# Global OpenAI client cache with a thread lock to prevent connection leaks across concurrent requests
 _llm_clients = {}
 _client_lock = threading.Lock()
 
@@ -47,10 +47,10 @@ def sanitize_prompt_input(text: str) -> str:
     Strips raw control character symbols and blocks instruction overrides
     to mitigate prompt injection attacks.
     """
-    # Strip ascii control characters
+    # Strip ASCII control characters that may interfere with prompts
     cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', text)
-    # Block systemic instruction overrides
-    override_pattern = r'(?i)(ignore\s+all\s+previous|system\s+prompt|instruction\s+override|override\s+system)'
+    # Remove common system prompt injection patterns
+    override_pattern = r'(?i)(ignore\s+all\s+previous|ignore\s+all\s+instructions|forget\s+all\s+previous|forget\s+all\s+instructions|system\s+prompt|system\s+override|instruction\s+override|override\s+system|override\s+instruction|developer\s+instruction)'
     cleaned = re.sub(override_pattern, '', cleaned)
     return cleaned.strip()
 
@@ -74,7 +74,7 @@ def heuristic_offline_compiler(question: str, db_type: str, schema_metadata: Lis
     question_lower = question.lower()
     db_type_lower = db_type.lower()
     
-    # 1. Table Matching
+    # 1. Match referenced tables
     matched_tables = []
     for t_name in tables_columns.keys():
         if re.search(r'\b' + re.escape(t_name.lower()) + r'\b', question_lower):
@@ -83,7 +83,7 @@ def heuristic_offline_compiler(question: str, db_type: str, schema_metadata: Lis
     # Default to first table if none recognized
     primary_table = matched_tables[0] if matched_tables else list(tables_columns.keys())[0]
 
-    # 2. Limit Extraction
+    # 2. Extract row limit
     limit_num = "10"
     limit_clause = "LIMIT 10"
     limit_match = re.search(r'\b(top|limit|first|show)\s+(\d+)\b', question_lower)
@@ -94,7 +94,7 @@ def heuristic_offline_compiler(question: str, db_type: str, schema_metadata: Lis
         limit_clause = ""
         limit_num = ""
 
-    # 3. Columns Selection
+    # 3. Select columns
     selected_cols = []
     for col in tables_columns[primary_table]:
         if re.search(r'\b' + re.escape(col.lower()) + r'\b', question_lower):
@@ -102,7 +102,7 @@ def heuristic_offline_compiler(question: str, db_type: str, schema_metadata: Lis
             
     columns_clause = ", ".join(selected_cols) if selected_cols else "*"
 
-    # 4. Aggregations (COUNT, SUM)
+    # 4. Handle aggregations (COUNT, SUM)
     is_count = any(word in question_lower for word in ["count", "total number", "how many"])
     if is_count:
         columns_clause = "COUNT(*)"
@@ -125,7 +125,7 @@ def heuristic_offline_compiler(question: str, db_type: str, schema_metadata: Lis
             limit_clause = ""
             limit_num = ""
 
-    # 5. Chronological Sorting
+    # 5. Apply chronological ordering
     order_clause = ""
     is_chrono = any(word in question_lower for word in ["latest", "recent", "newest", "youngest"])
     if is_chrono:
@@ -141,7 +141,7 @@ def heuristic_offline_compiler(question: str, db_type: str, schema_metadata: Lis
         if target_date_col:
             order_clause = f"ORDER BY {target_date_col} DESC"
 
-    # 6. Basic Auto-Joins (if multiple tables are referenced)
+    # 6. Auto-join referenced tables using FK relationships
     if len(matched_tables) > 1:
         secondary_table = matched_tables[1]
         fk_col = None
@@ -270,7 +270,7 @@ def generate_sql_from_question(question: str, db_type: str, schema_metadata: Lis
             )
             sql = response.choices[0].message.content
 
-        # Clean returned code block formatting markers if present
+        # Strip any markdown code block markers that the LLM may have added
         sql = sql.replace("```sql", "").replace("```", "").strip()
         return sql
     except Exception as e:

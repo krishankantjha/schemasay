@@ -34,7 +34,7 @@ def execute_assistant_query(
     Validates a query statement using AST-based checks, runs the query wrapped inside
     a hard limit query wrapper, measures performance, and writes log metrics.
     """
-    # 1. AST Security Gate
+    # Step 1: Validate SQL structure using AST analysis
     is_safe, safety_error = validate_sql_structure(raw_sql)
     if not is_safe:
         log_audit_transaction(
@@ -54,10 +54,10 @@ def execute_assistant_query(
             execution_time_ms=0.0
         )
 
-    # 2. Hard Paging Wrapper Construction using shared wrapper logic
+    # Step 2: Wrap the query with a hard row limit
     wrapped_sql = wrap_query_with_limit(raw_sql, connection.db_type)
 
-    # 3. Connection and Execution Sandbox
+    # Step 3: Execute query against the connection pool
     start_time = time.perf_counter()
     try:
         engine = get_connection(connection)
@@ -126,5 +126,5 @@ def execute_assistant_query(
         )
         
     finally:
-        # Disposing cached pools is handled by pool.py cache ejects; we keep the close safe
+        # Engine pool cleanup is handled by EngineRegistry; nothing to release here
         pass
