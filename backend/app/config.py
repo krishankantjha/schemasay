@@ -10,14 +10,14 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15  # Reduced from 1440 for security
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15  # Default: 15 minutes. Override via ACCESS_TOKEN_EXPIRE_MINUTES in .env
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     
-    # Optional Third-Party Keys
+    # AI provider API keys — both are optional. If neither is set, the heuristic offline compiler is used instead.
     OPENAI_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
     
-    # Cryptographic Key for symmetric encryption
+    # Fernet symmetric encryption key for storing database credentials. Generate with: Fernet.generate_key()
     ENCRYPTION_KEY: str
     
     # Allowed origins for CORS (comma-separated string)

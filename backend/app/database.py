@@ -10,14 +10,14 @@ engine = create_engine(
     pool_timeout=30
 )
 
-# Configure the database session factory
+# Session factory used by FastAPI's get_db() dependency for per-request database sessions
 SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
     bind=engine
 )
 
-# Declarative base class for mapping Python objects to database tables
+# Base class that all SQLAlchemy ORM models inherit from
 Base = declarative_base()
 
 def get_db():

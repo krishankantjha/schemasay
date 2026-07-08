@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.api.routes import auth, connections, schema, assistant, query
+from app.api.routes import auth, connections, schema, assistant, query, insights
 
 # Initialize structured logging
 logging.basicConfig(
@@ -55,6 +55,7 @@ app.include_router(connections.router, prefix="/api/v1")
 app.include_router(schema.router, prefix="/api/v1")
 app.include_router(assistant.router, prefix="/api/v1")
 app.include_router(query.router, prefix="/api/v1")
+app.include_router(insights.router, prefix="/api/v1")
 
 @app.get("/")
 def read_root():
