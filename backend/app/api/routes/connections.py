@@ -1,6 +1,6 @@
 import os
 import logging
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
@@ -203,17 +203,24 @@ def delete_connection(connection_id: int, db: Session = Depends(get_db), current
 def get_query_history(
     page: int = 1,
     limit: int = 100,
+    connection_id: Optional[int] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """
     Retrieves the paginated query execution history logs for the active user.
+    Optionally filters history logs to a specific connection source connection_id.
     """
     page_val = max(1, page)
     limit_val = max(1, min(100, limit))  # Enforce client request caps
     
-    return db.query(QueryAuditLog).filter(
+    query = db.query(QueryAuditLog).filter(
         QueryAuditLog.user_id == current_user.id
-    ).order_by(
+    )
+    
+    if connection_id is not None:
+        query = query.filter(QueryAuditLog.connection_id == connection_id)
+        
+    return query.order_by(
         QueryAuditLog.created_at.desc()
     ).offset((page_val - 1) * limit_val).limit(limit_val).all()

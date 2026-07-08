@@ -180,9 +180,10 @@ def test_query_history_endpoint(client, db):
     user_id = user_res.json()["id"]
     import datetime
     
-    # Add fake query logs directly to SQLite test database with distinct timestamps
+    # Add fake query logs directly to SQLite test database with distinct timestamps and connection IDs
     log1 = QueryAuditLog(
         user_id=user_id,
+        connection_id=1,
         question="How many users registered?",
         sql_query="SELECT COUNT(*) FROM users",
         execution_duration_ms=12,
@@ -191,6 +192,7 @@ def test_query_history_endpoint(client, db):
     )
     log2 = QueryAuditLog(
         user_id=user_id,
+        connection_id=2,
         question="Select all products",
         sql_query="SELECT * FROM products",
         execution_duration_ms=5,
@@ -201,13 +203,27 @@ def test_query_history_endpoint(client, db):
     db.add(log2)
     db.commit()
 
-    # Query history
+    # Query history without filter
     history_res = client.get("/api/v1/connections/history", headers=headers)
     assert history_res.status_code == status.HTTP_200_OK
     logs = history_res.json()
     assert len(logs) == 2
     assert logs[0]["question"] == "Select all products"  # Sorted chronologically (descending)
     assert logs[1]["question"] == "How many users registered?"
+
+    # Query history filtering by connection_id=1
+    history_conn1_res = client.get("/api/v1/connections/history?connection_id=1", headers=headers)
+    assert history_conn1_res.status_code == status.HTTP_200_OK
+    logs_conn1 = history_conn1_res.json()
+    assert len(logs_conn1) == 1
+    assert logs_conn1[0]["question"] == "How many users registered?"
+
+    # Query history filtering by connection_id=2
+    history_conn2_res = client.get("/api/v1/connections/history?connection_id=2", headers=headers)
+    assert history_conn2_res.status_code == status.HTTP_200_OK
+    logs_conn2 = history_conn2_res.json()
+    assert len(logs_conn2) == 1
+    assert logs_conn2[0]["question"] == "Select all products"
 
 # --- Helper Utility to generate active auth token ---
 def get_auth_token(client) -> str:
