@@ -35,8 +35,10 @@ class InMemoryRateLimiter:
             self.history[key].append(now)
             return False
 
-# Rate limiting instances: 5 attempts per IP address per 60 seconds
+# Rate limits (per IP address, per 60-second window):
+#   - login_limiter:    5 requests  (brute-force protection)
+#   - register_limiter: 5 requests  (account creation protection)
+#   - query_limiter:   30 requests  (AI query throughput cap)
 login_limiter = InMemoryRateLimiter(requests_limit=5, window_seconds=60)
 register_limiter = InMemoryRateLimiter(requests_limit=5, window_seconds=60)
-# Rate limiting instances: 30 attempts per IP address per 60 seconds
 query_limiter = InMemoryRateLimiter(requests_limit=30, window_seconds=60)
