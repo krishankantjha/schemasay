@@ -1,53 +1,49 @@
 import streamlit as st
-import pandas as pd
+import io
 from api_client import api_client
+from utils.error_handler import parse_api_response
+from state import KEY_TOKEN
 
 def show_connection_manager():
     """
-    Renders the Database Connections Manager screen using Streamlit.
-    Provides panels to view connections, test/save new servers, upload files,
-    and monitor query execution history logs.
+    Renders database connection listings, configuration editing forms, and CSV/Excel file uploads.
+    Enforces standardized API error checks.
     """
-    st.subheader("Database Connection Manager")
-    
-    token = st.session_state.get("token")
+    token = st.session_state.get(KEY_TOKEN)
     if not token:
-        st.error("Session expired. Please log in again.")
+        st.warning("Please log in to manage database connections.")
         return
 
-    # Setup distinct tabs for different manager operations
-    tab_list, tab_add, tab_upload, tab_history = st.tabs([
-        "Saved Connections", 
-        "Connect Database Server", 
-        "Upload Spreadsheet", 
-        "Execution History"
-    ])
+    st.write("### Database Connection Manager")
+    st.write("Configure connection credentials to live database servers or ingest flat spreadsheet files.")
 
-    # Tab 1: List and Delete Connections
+    # 1. Initialize view tabs
+    tab_list, tab_add, tab_upload = st.tabs(["Active Connections", "Configure Server Connection", "Upload Flat File"])
+
+    # --- Tab: Active Connections ---
     with tab_list:
-        with st.spinner("Loading connections..."):
+        st.write("#### Configured Database Sources")
+        
+        # Load connections
+        with st.spinner("Fetching active database connections..."):
             response = api_client.get_connections(token)
             
-        if response.status_code == 200:
-            connections = response.json()
+        connections = parse_api_response(response, "fetch database connections")
+        
+        if connections is not None:
             if not connections:
-                st.info("No database connections saved yet. Add a database or upload a file to begin.")
+                st.info("No connections configured yet. Use the 'Configure Server Connection' or 'Upload Flat File' tabs to get started.")
             else:
-                # Convert connection records to a display DataFrame
-                conn_data = []
-                for c in connections:
-                    conn_data.append({
-                        "ID": c["id"],
-                        "Name": c["name"],
-                        "Type": c["db_type"].upper(),
-                        "Host": c["host"] or "Local / Uploaded",
-                        "Database/Path": c["database_name"],
-                        "Username": c["username"] or "N/A"
-                    })
+                for conn in connections:
+                    with st.expander(f"Name: {conn['name']} (Engine: {conn['db_type'].upper()})"):
+                        st.write(f"- **ID:** {conn['id']}")
+                        st.write(f"- **Database Name:** {conn['database_name']}")
+                        st.write(f"- **Host:** {conn['host'] or 'Local Host / Flat File'}")
+                        if conn['port']:
+                            st.write(f"- **Port:** {conn['port']}")
+                        st.write(f"- **Username:** {conn['username'] or 'N/A'}")
+                        st.write(f"- **Created At:** {conn['created_at']}")
                 
-                st.dataframe(pd.DataFrame(conn_data), use_container_width=True)
-                
-                # Delete connection action UI
                 st.markdown("---")
                 st.write("#### Remove a Connection")
                 del_ids = [c["id"] for c in connections]
@@ -63,15 +59,13 @@ def show_connection_manager():
                     with st.spinner("Deleting connection..."):
                         del_response = api_client.delete_connection(token, selected_del_id)
                         
-                    if del_response.status_code == 200:
+                    data = parse_api_response(del_response, "delete connection")
+                    if data:
                         st.success("Connection deleted successfully.")
+                        st.cache_data.clear()
                         st.rerun()
-                    else:
-                        st.error(del_response.json().get("detail", "Failed to delete connection"))
-        else:
-            st.error("Failed to load database connections.")
 
-    # Tab 2: Add Live Database Server Connection
+    # --- Tab: Configure Server Connection ---
     with tab_add:
         st.write("#### Configure a Database Server")
         
@@ -88,30 +82,39 @@ def show_connection_manager():
         
         name = st.text_input("Connection Name", placeholder="e.g. Sales DB")
         
-        # Display inputs dynamically depending on type selection
+        # SQLite connections only need a file path — skip host, port, and credentials fields
         if db_type == "sqlite":
-            database_name = st.text_input("Absolute File Path", placeholder="C:/databases/my_data.db")
-            host = None
+            database_name = st.text_input("Local File Path", placeholder="e.g. /data/sales.db")
+            host = ""
             port = None
-            username = None
-            password = None
+            username = ""
+            password = ""
         else:
-            host = st.text_input("Host Address", placeholder="127.0.0.1")
-            default_port = {"postgresql": 5432, "mysql": 3306, "mssql": 1433}[db_type]
-            port = st.number_input("Port", min_value=1, max_value=65535, value=default_port)
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
-            database_name = st.text_input("Database Name")
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                host = st.text_input("Server Host address", placeholder="e.g. 192.168.1.1 or db.sales.company.com")
+            with col2:
+                port = st.number_input("Port", min_value=1, max_value=65535, value=5432)
+                
+            col3, col4 = st.columns([1, 1])
+            with col3:
+                username = st.text_input("Username", placeholder="e.g. read_only_user")
+            with col4:
+                password = st.text_input("Password", type="password", placeholder="Secure login credential")
+                
+            database_name = st.text_input("Target Database Name", placeholder="e.g. core_sales_ledger")
 
-        col1, col2 = st.columns(2)
-        
-        # Test Connection Trigger
-        with col1:
-            if st.button("Test Connection"):
-                if not name or not database_name:
-                    st.error("Name and database path/name are required.")
+        st.markdown("---")
+        col_test, col_save = st.columns([1, 1])
+
+        with col_test:
+            if st.button("Test Parameters Connection"):
+                if not name:
+                    st.error("Please enter a name for this connection.")
                 elif db_type != "sqlite" and (not host or not username or not password):
-                    st.error("Host, Username, and Password are required for server databases.")
+                    st.error("Please fill in host, username, and password fields to test.")
+                elif not database_name:
+                    st.error("Please fill in database name parameter.")
                 else:
                     test_payload = {
                         "db_type": db_type,
@@ -121,22 +124,21 @@ def show_connection_manager():
                         "password": password,
                         "database_name": database_name
                     }
-                    with st.spinner("Testing database connectivity..."):
+                    with st.spinner("Testing parameters connection..."):
                         test_response = api_client.test_connection(token, test_payload)
                         
-                    if test_response.status_code == 200:
+                    data = parse_api_response(test_response, "test connection")
+                    if data and data.get("success"):
                         st.success("Connection test succeeded!")
-                    else:
-                        detail = test_response.json().get("detail", "Connection test failed")
-                        st.error(detail)
-                        
-        # Save Connection Trigger
-        with col2:
-            if st.button("Save Connection"):
-                if not name or not database_name:
-                    st.error("Name and database path/name are required.")
+
+        with col_save:
+            if st.button("Save Database Configuration"):
+                if not name:
+                    st.error("Please enter a name for this connection.")
                 elif db_type != "sqlite" and (not host or not username or not password):
-                    st.error("Host, Username, and Password are required for server databases.")
+                    st.error("Please fill in host, username, and password fields to save.")
+                elif not database_name:
+                    st.error("Please fill in database name parameter.")
                 else:
                     save_payload = {
                         "name": name,
@@ -150,14 +152,13 @@ def show_connection_manager():
                     with st.spinner("Saving database configuration..."):
                         save_response = api_client.create_connection(token, save_payload)
                         
-                    if save_response.status_code == 201:
+                    data = parse_api_response(save_response, "save connection")
+                    if data:
                         st.success("Connection saved successfully.")
+                        st.cache_data.clear()
                         st.rerun()
-                    else:
-                        detail = save_response.json().get("detail", "Failed to save connection")
-                        st.error(detail)
 
-    # Tab 3: Upload CSV or Excel file
+    # --- Tab: Upload CSV or Excel File ---
     with tab_upload:
         st.write("#### Upload Flat Spreadsheets")
         st.info("Uploaded CSV and Excel spreadsheets will be converted into local SQLite tables automatically.")
@@ -178,35 +179,8 @@ def show_connection_manager():
                         file_name=uploaded_file.name,
                         file_bytes=uploaded_file.read()
                     )
-                    
-                if response.status_code == 201:
-                    st.success("File uploaded and connection created successfully!")
+                data = parse_api_response(response, "upload spreadsheet connection")
+                if data:
+                    st.success(f"Success | Ingested spreadsheet, cached tables, and registered SQLite database.")
+                    st.cache_data.clear()
                     st.rerun()
-                else:
-                    detail = response.json().get("detail", "File upload failed")
-                    st.error(detail)
-
-    # Tab 4: Execution History Audit Logs
-    with tab_history:
-        st.write("#### Query Execution History")
-        with st.spinner("Loading query history logs..."):
-            history_response = api_client.get_query_history(token)
-            
-        if history_response.status_code == 200:
-            history_logs = history_response.json()
-            if not history_logs:
-                st.info("No query logs generated yet. Queries run in later phases will be audited here.")
-            else:
-                log_rows = []
-                for log in history_logs:
-                    log_rows.append({
-                        "Time": datetime_str := log["created_at"].replace("T", " ")[:19],
-                        "Question": log["question"],
-                        "Generated SQL": log["sql_query"],
-                        "Status": log["status"].upper(),
-                        "Duration (ms)": log["execution_duration_ms"] or "N/A",
-                        "Errors": log["error_message"] or "None"
-                    })
-                st.dataframe(pd.DataFrame(log_rows), use_container_width=True)
-        else:
-            st.error("Failed to load query execution logs.")
