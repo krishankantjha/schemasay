@@ -83,11 +83,11 @@ def render_chart(columns: List[str], rows: List[Dict[str, Any]], chart_config: A
         if df[color_axis].dropna().nunique() > 15:
             color_axis = None
 
-    # Sanitize every database column name and rename DataFrame schema
+    # Escape column names to prevent XSS in chart labels
     sanitized_cols = {col: sanitize_html(col) for col in df.columns}
     df = df.rename(columns=sanitized_cols)
 
-    # Sanitize visual layout mappings to match escaped columns
+    # Update axis references to use the escaped column names
     x_axis = sanitize_html(x_axis) if x_axis else None
     y_axis = sanitize_html(y_axis) if y_axis else None
     color_axis = sanitize_html(color_axis) if color_axis else None
@@ -157,7 +157,7 @@ def render_chart(columns: List[str], rows: List[Dict[str, Any]], chart_config: A
                     )
 
                 if fig:
-                    # Enforce premium styling options with responsive config
+                    # Apply clean layout, transparent background, and responsive sizing
                     fig.update_layout(
                         margin=dict(l=20, r=20, t=50, b=20),
                         hovermode="x unified" if chart_type != "pie" else None,
