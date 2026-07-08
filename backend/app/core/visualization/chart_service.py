@@ -81,7 +81,7 @@ def select_chart_type_from_df(df: pd.DataFrame, question: str) -> ChartConfig:
     temporal_cols, numeric_cols, categorical_cols = infer_column_types(df)
     q_lower = question.lower()
 
-    # Rule 1: Temporal Trend Analysis -> Line Chart
+    # Rule 1: Temporal + Numeric -> Line Chart
     if temporal_cols and numeric_cols:
         color_axis = categorical_cols[0] if categorical_cols else None
         return ChartConfig(
@@ -91,7 +91,7 @@ def select_chart_type_from_df(df: pd.DataFrame, question: str) -> ChartConfig:
             color_axis=color_axis
         )
 
-    # Rule 2: Categorical + Numeric Comparison
+    # Rule 2: Categorical + Numeric -> Bar or Pie Chart
     if categorical_cols and numeric_cols:
         cat_col = categorical_cols[0]
         num_col = numeric_cols[0]
@@ -120,7 +120,7 @@ def select_chart_type_from_df(df: pd.DataFrame, question: str) -> ChartConfig:
                 y_axis=num_col
             )
 
-    # Rule 3: Correlation distributions -> Scatter Plot
+    # Rule 3: Two Numeric columns -> Scatter Plot
     if len(numeric_cols) >= 2:
         color_axis = categorical_cols[0] if categorical_cols else None
         return ChartConfig(
@@ -130,7 +130,7 @@ def select_chart_type_from_df(df: pd.DataFrame, question: str) -> ChartConfig:
             color_axis=color_axis
         )
 
-    # Rule 4: Single numeric frequency profiles -> Histogram
+    # Rule 4: Single Numeric with distribution intent -> Histogram
     if len(numeric_cols) == 1 and len(df) > 5 and any(k in q_lower for k in ["distribution", "spread", "frequency", "range", "histogram"]):
         return ChartConfig(
             chart_type="histogram",
