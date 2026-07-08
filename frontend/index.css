@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Define Premium Color Tokens */
+:root {
+    --primary-color: #2563EB;       /* Royal Blue Accent */
+    --primary-hover: #1D4ED8;       /* Dark Royal Blue */
+    --bg-dark-slate: #1E293B;      /* Dark Slate for Sidebar */
+    --bg-light-gray: #F8FAFC;      /* App Canvas Background */
+    --card-border: #E2E8F0;        /* Subtle Border Gray */
+    --text-primary: #0F172A;       /* Slate Dark Text */
+    --text-secondary: #64748B;     /* Slate Gray Text */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+    --border-radius: 12px;
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Global Font Override */
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+}
+
+/* Heading Overrides */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+}
+
+/* Styled Container Cards */
+.workspace-card {
+    background: #FFFFFF;
+    border: 1px solid var(--card-border);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-fast);
+    margin-bottom: 1rem;
+}
+.workspace-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+/* Glassmorphic Sidebar Panels */
+section[data-testid="stSidebar"] {
+    background-color: var(--bg-dark-slate) !important;
+    color: #FFFFFF !important;
+    border-right: 1px solid rgba(255,255,255,0.05) !important;
+}
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+    color: #E2E8F0 !important;
+}
+section[data-testid="stSidebar"] h1, 
+section[data-testid="stSidebar"] h2, 
+section[data-testid="stSidebar"] h3, 
+section[data-testid="stSidebar"] h4 {
+    color: #FFFFFF !important;
+}
+
+/* Input Fields Refinements */
+div[data-baseweb="input"], textarea {
+    border-radius: 8px !important;
+    border: 1px solid var(--card-border) !important;
+    transition: var(--transition-fast) !important;
+}
+div[data-baseweb="input"]:focus-within, textarea:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* Custom Text Area for Monospaced SQL Editing */
+textarea[aria-label="SQL Query Editor"] {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.95rem !important;
+    line-height: 1.5 !important;
+    background-color: #FAF8F6 !important;
+    color: #1E293B !important;
+}
+
+/* Buttons Refinements */
+button[kind="secondary"] {
+    background-color: #FFFFFF !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 8px !important;
+    color: var(--text-primary) !important;
+    font-weight: 500 !important;
+    transition: var(--transition-fast) !important;
+    padding: 0.5rem 1rem !important;
+}
+button[kind="secondary"]:hover {
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+    background-color: rgba(37, 99, 235, 0.04) !important;
+    transform: translateY(-1px);
+}
+
+/* Primary Action Buttons Override */
+button[kind="primary"] {
+    background-color: var(--primary-color) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+    transition: var(--transition-fast) !important;
+    padding: 0.5rem 1.25rem !important;
+}
+button[kind="primary"]:hover {
+    background-color: var(--primary-hover) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+    transform: translateY(-1px);
+}
+
+/* Custom Badges */
+.db-badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    margin-right: 0.5rem;
+}
+.badge-postgres { background-color: #E0F2FE; color: #0369A1; }
+.badge-mysql { background-color: #FEF3C7; color: #D97706; }
+.badge-mssql { background-color: #FEE2E2; color: #DC2626; }
+.badge-sqlite { background-color: #DCFCE7; color: #15803D; }
+
+/* Custom Flex Row for KPI cards */
+.kpi-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+.kpi-card {
+    flex: 1;
+    background: #FFFFFF;
+    border: 1px solid var(--card-border);
+    border-radius: var(--border-radius);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+}
+.kpi-title {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.25rem 0;
+}
+.kpi-value {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
