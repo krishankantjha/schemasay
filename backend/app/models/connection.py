@@ -19,7 +19,7 @@ class DatabaseConnection(Base):
     host = Column(String, nullable=True)
     port = Column(Integer, nullable=True)
     username = Column(String, nullable=True)
-    database_name = Column(String, nullable=False)  # Stores local file path for SQLite or file uploads
+    database_name = Column(String, nullable=False)  # Database name for server connections; local file path for SQLite/file uploads
     encrypted_password = Column(String, nullable=True)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -59,7 +59,7 @@ class QueryAuditLog(Base):
     question = Column(String, nullable=False)
     sql_query = Column(String, nullable=False)
     execution_duration_ms = Column(Integer, nullable=True)
-    status = Column(String, nullable=False)  # e.g., 'success', 'failed'
+    status = Column(String, nullable=False)  # 'success' or 'failed'
     error_message = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
