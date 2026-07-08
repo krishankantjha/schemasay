@@ -13,15 +13,15 @@ from app.core.connections.pool import engine_registry
 
 logger = logging.getLogger("schemasay.connector")
 
-# Setup base directory for local SQLite spreadsheet uploads
+# Storage directory for SQLite databases created from uploaded CSV/Excel files
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
 def sanitize_error_message(msg: str) -> str:
     """
     Regex-masks plaintext credentials and urls inside database driver exceptions.
+    Masks credentials from SQLAlchemy connection strings (e.g., postgresql://user:pass@host/db).
     """
-    # Matches db_type://user:password@host:port/db or similar
     pattern = r'[a-zA-Z0-9\+\-_]+://[^/]+@'
     return re.sub(pattern, '***://***@', msg)
 
@@ -69,7 +69,8 @@ def get_connection_url(db_type: str, host: str, port: int, username: str, passwo
 
 def get_connection_string(db_type: str, host: str, port: int, username: str, password: str, database_name: str) -> str:
     """
-    Constructs the appropriate SQLAlchemy connection string based on database type (for backward compatibility).
+    Returns a plain SQLAlchemy connection string for the given database type.
+    Delegates to get_connection_url() and converts the result to a string.
     """
     return str(get_connection_url(db_type, host, port, username, password, database_name))
 
@@ -110,14 +111,13 @@ def test_connection(db_type: str, host: str, port: int, username: str, password:
         elif db_type_lower == "mssql":
             connect_args = {"login_timeout": 10}
 
-        # Instantiate a temporary engine with connection timeouts
         if db_type_lower in ["sqlite", "file_upload"]:
             engine = create_engine(url, connect_args={"check_same_thread": False})
         else:
             engine = create_engine(url, connect_args=connect_args, pool_pre_ping=True)
             
         with engine.connect() as conn:
-            # Execute lightweight probe query
+            # Run a minimal query to confirm the connection is live
             conn.execute(text("SELECT 1"))
             
         return True, ""

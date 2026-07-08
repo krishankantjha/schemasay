@@ -8,7 +8,7 @@ from app.core.connections.encryptor import decrypt_password
 
 logger = logging.getLogger("schemasay.pool")
 
-from collections import OrderedDict
+from collections import OrderedDict  # OrderedDict preserves insertion order for LRU eviction
 
 class EngineRegistry:
     """
@@ -84,7 +84,7 @@ class EngineRegistry:
                 self._engines.move_to_end(connection_id)
             return self._engines[connection_id]
 
-        # Slow path: instantiate and cache engine with double-checked locking
+        # Engine not in cache — acquire lock and create a new one
         with self._registry_lock:
             if connection_id in self._engines:
                 self._engines.move_to_end(connection_id)
@@ -96,7 +96,7 @@ class EngineRegistry:
 
             try:
                 if db_type_lower in ["sqlite", "file_upload"]:
-                    # SQLite engines do not support pool_size and max_overflow parameters
+                    # SQLite does not support connection pooling; use a simpler single-connection engine
                     engine = create_engine(
                         url,
                         connect_args={"check_same_thread": False, "timeout": 30}
@@ -111,7 +111,6 @@ class EngineRegistry:
                     elif db_type_lower == "mssql":
                         connect_args = {"login_timeout": 10, "timeout": 30}
 
-                    # Configure production pool sizing limits
                     engine = create_engine(
                         url,
                         pool_size=10,
@@ -183,5 +182,5 @@ def before_cursor_execute(conn, cursor, statement, parameters, context, executem
                 if time.time() - start_time > 30:
                     return 1
                 return 0
-            # Set callback to be invoked every 100 instructions
+            # Invoke the handler every 100 SQLite virtual machine instructions (low overhead frequency)
             dbapi_conn.set_progress_handler(sqlite_progress_handler, 100)
