@@ -12,22 +12,25 @@ def show_auth_page():
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-        /* Set page background gradient */
-        div[data-testid="stAppViewContainer"] {
+        /* Set page background gradient and disable body scroll */
+        html, body, div[data-testid="stAppViewContainer"] {
             background: linear-gradient(180deg, #081C5A 0%, #0B2C82 50%, #123FA6 100%) !important;
             height: 100vh !important;
+            max-height: 100vh !important;
             width: 100% !important;
             overflow: hidden !important;
         }
 
-        /* Collapse Streamlit default top/bottom padding to center card vertically */
+        /* Collapse Streamlit default top/bottom padding and align perfectly centered */
         div[data-testid="block-container"] {
             padding-top: 0 !important;
             padding-bottom: 0 !important;
             height: 100vh !important;
+            max-height: 100vh !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
+            overflow: hidden !important;
         }
 
         /* Hide standard header, footer, and menu */
