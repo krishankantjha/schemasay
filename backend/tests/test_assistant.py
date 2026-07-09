@@ -250,3 +250,26 @@ def get_auth_token(client) -> str:
         "password": password
     })
     return login_res.json()["access_token"]
+
+def test_format_sql_query(client):
+    """
+    Verifies that the /query/format endpoint successfully formats SQL queries.
+    """
+    token = get_auth_token(client)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Clean query format test
+    unformatted_sql = "SELECT id,name,email FROM users WHERE status='active' ORDER BY id desc"
+    res = client.post("/api/v1/query/format", json={"sql_query": unformatted_sql}, headers=headers)
+    assert res.status_code == status.HTTP_200_OK
+    formatted_sql = res.json()["formatted_sql"]
+    
+    # Assert formatting was applied
+    assert "SELECT" in formatted_sql
+    assert "\n" in formatted_sql or "  " in formatted_sql
+
+    # Invalid query format fallback verification
+    invalid_sql = "SELECT id FROM FROM"
+    fallback_res = client.post("/api/v1/query/format", json={"sql_query": invalid_sql}, headers=headers)
+    assert fallback_res.status_code == status.HTTP_200_OK
+    assert fallback_res.json()["formatted_sql"] == invalid_sql

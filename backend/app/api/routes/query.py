@@ -146,3 +146,33 @@ async def execute_raw_query(
         query_id=query_id,
         chart_config=chart_config
     )
+
+# --- SQL Format routes ---
+
+class FormatQueryRequest(BaseModel):
+    """
+    Request payload containing the SQL query to beautify.
+    """
+    sql_query: str = Field(..., min_length=1, max_length=10000)
+
+class FormatQueryResponse(BaseModel):
+    """
+    Response payload containing the beautified SQL query.
+    """
+    formatted_sql: str
+
+@router.post("/format", response_model=FormatQueryResponse, status_code=status.HTTP_200_OK)
+def format_query(
+    payload: FormatQueryRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Beautifies manual SQL statement using sqlglot.
+    """
+    try:
+        import sqlglot
+        formatted = sqlglot.transpile(payload.sql_query, pretty=True)[0]
+        return FormatQueryResponse(formatted_sql=formatted)
+    except Exception as e:
+        logger.warning(f"SQL Formatting parsing error: {str(e)}. Returning original SQL.")
+        return FormatQueryResponse(formatted_sql=payload.sql_query)

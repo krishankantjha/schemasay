@@ -179,4 +179,12 @@ class APIClient:
         headers = {"Authorization": f"Bearer {token}"}
         return self.session.post(f"{self.base_url}/api/v1/insights/generate", json=payload, headers=headers, timeout=(5, 120))
 
+    def format_sql(self, token: str, sql_query: str) -> requests.Response:
+        """
+        Beautifies SQL query via backend formatter endpoint.
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        payload = {"sql_query": sql_query}
+        return self.session.post(f"{self.base_url}/api/v1/query/format", json=payload, headers=headers, timeout=(5, 120))
+
 api_client = APIClient()
