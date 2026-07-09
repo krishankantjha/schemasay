@@ -18,11 +18,6 @@ if os.path.exists(css_path):
     with open(css_path) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-st.title("SchemaSay")
-st.subheader("Your AI-Powered SQL Analytics Platform")
-
-st.write("---")
-
 init_session_state()
 
 # Check if the user is logged in
