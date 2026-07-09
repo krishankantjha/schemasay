@@ -198,8 +198,8 @@ def show_auth_page():
             flex: none !important;
             padding: 0 !important;
         }
-        .st-key-signup_row_container button,
-        .st-key-signin_row_container button {
+        .st-key-signup_row_container div[data-testid="stButton"] button,
+        .st-key-signin_row_container div[data-testid="stButton"] button {
             background-color: transparent !important;
             border: none !important;
             color: #4169E1 !important;
