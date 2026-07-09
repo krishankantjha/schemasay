@@ -5,6 +5,9 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.api.routes import auth, connections, schema, assistant, query, insights
+from app.database import Base, engine
+from app.models.user import User
+from app.models.connection import DatabaseConnection, QueryAuditLog, DatabaseSchemaCache
 
 # Initialize structured logging
 logging.basicConfig(
@@ -35,6 +38,11 @@ app.add_middleware(
 @app.on_event("startup")
 def startup_checks():
     logger.info("Initializing SchemaSay API Engine startup checks...")
+    
+    # Create tables resiliently in target database on startup (for fresh Postgres/SQLite setups)
+    logger.info("Verifying database schema tables...")
+    Base.metadata.create_all(bind=engine)
+    
     if not settings.OPENAI_API_KEY:
         logger.warning("OPENAI_API_KEY is not defined. Features utilizing OpenAI capabilities will be restricted.")
     if not settings.GEMINI_API_KEY:
