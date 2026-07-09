@@ -40,8 +40,11 @@ def startup_checks():
     logger.info("Initializing SchemaSay API Engine startup checks...")
     
     # Create tables resiliently in target database on startup (for fresh Postgres/SQLite setups)
-    logger.info("Verifying database schema tables...")
-    Base.metadata.create_all(bind=engine)
+    # Skip during testing sessions to prevent database connection conflicts
+    import sys
+    if "pytest" not in sys.modules:
+        logger.info("Verifying database schema tables...")
+        Base.metadata.create_all(bind=engine)
     
     if not settings.OPENAI_API_KEY:
         logger.warning("OPENAI_API_KEY is not defined. Features utilizing OpenAI capabilities will be restricted.")
