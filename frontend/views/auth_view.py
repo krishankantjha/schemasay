@@ -175,21 +175,49 @@ def show_auth_page():
         }
 
         /* Style the Toggle Auth state buttons to look like clean blue text links */
-        div[data-testid="stButton"] button[kind="secondary"] {
+        .st-key-signup_row_container, .st-key-signin_row_container {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            margin-top: 15px !important;
+            background: transparent !important;
+        }
+        .st-key-signup_row_container div[data-testid="column"],
+        .st-key-signin_row_container div[data-testid="column"] {
+            width: auto !important;
+            flex: none !important;
+            padding: 0 !important;
+        }
+        .st-key-signup_row_container button,
+        .st-key-signin_row_container button {
             background-color: transparent !important;
             border: none !important;
             color: #4169E1 !important;
             box-shadow: none !important;
             font-size: 13px !important;
             font-weight: 600 !important;
-            text-decoration: none !important;
-            margin: 0 auto !important;
-            display: block !important;
+            text-align: left !important;
+            padding: 0 0 0 4px !important;
+            height: 32px !important;
+            line-height: 32px !important;
         }
-        div[data-testid="stButton"] button[kind="secondary"]:hover {
+        .st-key-signup_row_container button:hover,
+        .st-key-signin_row_container button:hover {
             color: #2F5DD7 !important;
             text-decoration: underline !important;
             background-color: transparent !important;
+        }
+
+        /* Force text input container divs (like suffix/eye icon wrapper) to be transparent */
+        div[data-testid="stTextInput"] div {
+            background-color: transparent !important;
+        }
+        div[data-testid="stTextInput"] button {
+            background-color: transparent !important;
+            border: none !important;
+        }
+        div[data-testid="stTextInput"] button svg {
+            fill: #64748B !important;
         }
         </style>
         """,
@@ -339,9 +367,14 @@ def show_auth_page():
                                     st.error(detail)
                         
                         st.write("")
-                        if st.button("Don't have an account? Sign up", key="toggle_to_signup", type="secondary", use_container_width=True):
-                            st.session_state["auth_mode"] = "signup"
-                            st.rerun()
+                        with st.container(key="signup_row_container"):
+                            col_lbl, col_btn = st.columns([1.8, 1])
+                            with col_lbl:
+                                st.markdown("<p style='text-align: right; margin: 0; font-size: 13px; color: #6B7280; font-weight: 500; line-height: 32px;'>Don't have an account?</p>", unsafe_allow_html=True)
+                            with col_btn:
+                                if st.button("Sign up", key="toggle_to_signup", type="secondary"):
+                                    st.session_state["auth_mode"] = "signup"
+                                    st.rerun()
 
                     else:
                         # Sign Up view
@@ -403,6 +436,11 @@ def show_auth_page():
                                     st.error(detail)
                         
                         st.write("")
-                        if st.button("Already have an account? Log in", key="toggle_to_login", type="secondary", use_container_width=True):
-                            st.session_state["auth_mode"] = "login"
-                            st.rerun()
+                        with st.container(key="signin_row_container"):
+                            col_lbl, col_btn = st.columns([2.1, 1])
+                            with col_lbl:
+                                st.markdown("<p style='text-align: right; margin: 0; font-size: 13px; color: #6B7280; font-weight: 500; line-height: 32px;'>Already have an account?</p>", unsafe_allow_html=True)
+                            with col_btn:
+                                if st.button("Log in", key="toggle_to_login", type="secondary"):
+                                    st.session_state["auth_mode"] = "login"
+                                    st.rerun()
