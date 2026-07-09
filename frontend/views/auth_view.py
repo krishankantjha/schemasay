@@ -40,6 +40,9 @@ def show_auth_page():
 
         .stApp {
             background: transparent !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            overflow: hidden !important;
         }
 
         /* Style the main auth container card using stable key class */
@@ -61,6 +64,13 @@ def show_auth_page():
         /* Make columns layout flush */
         div[data-testid="column"] {
             padding: 0 !important;
+        }
+
+        /* Set a tight gap on the toggle horizontal block to keep text cohesive */
+        .st-key-signup_row_container div[data-testid="stHorizontalBlock"],
+        .st-key-signin_row_container div[data-testid="stHorizontalBlock"] {
+            gap: 4px !important;
+            justify-content: center !important;
         }
 
         /* Left Column: branding sidebar panel */
