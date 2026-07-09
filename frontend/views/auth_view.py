@@ -39,8 +39,8 @@ def show_auth_page():
             background: transparent !important;
         }
 
-        /* Center container wrapper */
-        div.stVerticalBlockBorderWrapper {
+        /* Style the main auth container card using stable key class */
+        .st-key-auth_container_card {
             background-color: #FFFFFF !important;
             border: 1px solid #E7EDF8 !important;
             border-radius: 30px !important;
@@ -48,7 +48,7 @@ def show_auth_page():
             padding: 0 !important;
             overflow: hidden !important;
             max-width: 1040px !important;
-            margin: 40px auto !important;
+            margin: 0 auto !important;
         }
 
         /* Make columns layout flush */
@@ -57,7 +57,7 @@ def show_auth_page():
         }
 
         /* Left Column: branding sidebar panel */
-        div.stVerticalBlockBorderWrapper div[data-testid="column"]:first-child {
+        .st-key-auth_container_card div[data-testid="column"]:first-child {
             background: linear-gradient(135deg, #061543 0%, #0B2C82 100%) !important;
             color: #FFFFFF !important;
             border-radius: 30px 0 0 30px !important;
@@ -65,16 +65,16 @@ def show_auth_page():
         }
 
         /* Right Column: authentication form panel */
-        div.stVerticalBlockBorderWrapper div[data-testid="column"]:last-child {
+        .st-key-auth_container_card div[data-testid="column"]:last-child {
             padding: 45px 50px !important;
             background-color: #FFFFFF !important;
             border-radius: 0 30px 30px 0 !important;
         }
 
         /* Force dark text for visibility in the white right column panel */
-        div.stVerticalBlockBorderWrapper div[data-testid="column"]:last-child h3,
-        div.stVerticalBlockBorderWrapper div[data-testid="column"]:last-child p,
-        div.stVerticalBlockBorderWrapper div[data-testid="column"]:last-child span {
+        .st-key-auth_container_card div[data-testid="column"]:last-child h3,
+        .st-key-auth_container_card div[data-testid="column"]:last-child p,
+        .st-key-auth_container_card div[data-testid="column"]:last-child span {
             color: #111827 !important;
         }
 
@@ -176,7 +176,7 @@ def show_auth_page():
     col_padding1, col_container, col_padding2 = st.columns([0.1, 9.8, 0.1])
     
     with col_container:
-        with st.container(border=True):
+        with st.container(border=True, key="auth_container_card"):
             col_brand, col_form = st.columns([1, 1.2])
 
             # Left Column: Product Branding & Features Pitch Sidebar
