@@ -21,23 +21,77 @@ def render_sidebar_view() -> str:
         user_res = api_client.get_me(token)
     
     display_name = "User"
+    user_email = ""
+    user_data = {}
     if user_res.status_code == 200:
         user_data = user_res.json()
-        display_name = user_data.get("full_name") or user_data.get("email")
+        display_name = user_data.get("full_name") or user_data.get("email") or "User"
+        user_email = user_data.get("email") or ""
 
-    st.sidebar.title("SchemaSay")
-    st.sidebar.write(f"Logged in as: **{display_name}**")
-    st.sidebar.markdown("---")
-
-    page = st.sidebar.radio(
-        "Navigation Menu",
-        options=["Query Assistant", "Database Connections"]
+    # App branding with clean design
+    st.sidebar.markdown(
+        """
+        <div class="sidebar-logo-bar">
+            <span class="logo-text">Schema<span class="logo-accent">Say</span></span>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
+    # User Profile Card with round initials avatar
+    initials = ""
+    if display_name:
+        parts = display_name.split()
+        if len(parts) >= 2:
+            initials = (parts[0][0] + parts[1][0]).upper()
+        elif len(parts) == 1 and len(parts[0]) >= 2:
+            initials = parts[0][:2].upper()
+        else:
+            initials = "US"
+    else:
+        initials = "US"
+
+    st.sidebar.markdown(
+        f"""
+        <div class="sidebar-profile-card">
+            <div class="avatar-circle">{initials}</div>
+            <div class="profile-info">
+                <div class="profile-name">{display_name}</div>
+                <div class="profile-email">{user_email}</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Premium Sidebar Navigation Switcher buttons
+    if "active_sidebar_page" not in st.session_state:
+        st.session_state["active_sidebar_page"] = "Query Assistant"
+
+    st.sidebar.markdown("<div style='margin-top: 15px; margin-bottom: 10px; font-size: 11px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;'>Navigation</div>", unsafe_allow_html=True)
+    
+    with st.sidebar.container(key="sidebar_navigation_menu"):
+        is_query = st.session_state["active_sidebar_page"] == "Query Assistant"
+        is_db = st.session_state["active_sidebar_page"] == "Database Connections"
+        
+        # Style active and inactive buttons using CSS class overrides
+        query_btn_cls = "active" if is_query else "inactive"
+        db_btn_cls = "active" if is_db else "inactive"
+        
+        if st.button("💬 Query Assistant", key="nav_query_assistant_sidebar_btn", use_container_width=True):
+            st.session_state["active_sidebar_page"] = "Query Assistant"
+            st.rerun()
+            
+        if st.button("🔗 Database Connections", key="nav_db_connections_sidebar_btn", use_container_width=True):
+            st.session_state["active_sidebar_page"] = "Database Connections"
+            st.rerun()
+
+    page = st.session_state["active_sidebar_page"]
+
     st.sidebar.markdown("---")
 
-    # Active Connection Configuration Selector
-    st.sidebar.write("### Database Source")
+    # Active Database Connection Manager
+    st.sidebar.markdown("<div style='font-size: 11px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;'>Database Source</div>", unsafe_allow_html=True)
     connections = get_cached_connections(token)
     
     if connections is None:
@@ -60,7 +114,8 @@ def render_sidebar_view() -> str:
         "Active Source",
         options=conn_ids,
         format_func=lambda x: conn_options[x],
-        index=default_idx
+        index=default_idx,
+        label_visibility="collapsed"
     )
 
     if st.session_state.get(KEY_ACTIVE_CONNECTION_ID) != selected_id:
@@ -69,8 +124,33 @@ def render_sidebar_view() -> str:
         st.session_state.pop(KEY_QUERY_HISTORY, None)
         st.session_state[KEY_HISTORY_PAGE] = 1
 
-    # Force reflection schema updates
-    if st.sidebar.button("Sync Schema", key="sync_schema_sidebar_btn"):
+    # Render active database details card with colored engine badges
+    selected_conn = next((c for c in connections if c["id"] == selected_id), None)
+    if selected_conn:
+        db_type = selected_conn["db_type"].lower()
+        badge_class = f"badge-{db_type}"
+        host_display = selected_conn.get("host", "local")
+        port_display = f":{selected_conn['port']}" if selected_conn.get("port") else ""
+        if db_type == "sqlite":
+            host_display = "local_file"
+            port_display = ""
+        st.sidebar.markdown(
+            f"""
+            <div class="active-connection-card">
+                <div class="conn-header">
+                    <span class="db-badge {badge_class}">{db_type}</span>
+                    <span class="conn-status">Active</span>
+                </div>
+                <div class="conn-name">{selected_conn['name']}</div>
+                <div class="conn-host">{host_display}{port_display}</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    st.sidebar.write("")
+    # Sync Schema Action
+    if st.sidebar.button("Sync Schema", key="sync_schema_sidebar_btn", use_container_width=True):
         with st.spinner("Reflecting database schema..."):
             sync_res = api_client.sync_schema(token, selected_id)
         if sync_res.status_code == 200:
@@ -80,8 +160,10 @@ def render_sidebar_view() -> str:
         else:
             st.sidebar.error("Failed to sync schema.")
 
+    st.sidebar.markdown("---")
+
     # 1. Searchable Schema Explorer
-    st.sidebar.write("#### Schema Explorer")
+    st.sidebar.markdown("<div style='font-size: 11px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;'>Schema Explorer</div>", unsafe_allow_html=True)
     schema_cache = get_cached_schema(token, selected_id)
 
     if schema_cache is not None:
@@ -102,14 +184,15 @@ def render_sidebar_view() -> str:
             else:
                 st.sidebar.warning("Schema cache empty. Synchronize schema manually.")
         else:
-            schema_search = st.sidebar.text_input("Search tables/columns", key="schema_search_input", placeholder="Filter...").strip().lower()
+            schema_search = st.sidebar.text_input("Search tables/columns", key="schema_search_input", placeholder="Search tables or columns...", label_visibility="collapsed").strip().lower()
 
             tables_map = {}
             for col in schema_cache:
                 t_name = col["table_name"]
                 if t_name not in tables_map:
                     tables_map[t_name] = []
-                tables_map[t_name].append(f"{col['column_name']} ({col['data_type']})")
+                pk_suffix = " (PK)" if col.get("is_primary_key") else ""
+                tables_map[t_name].append(f"{col['column_name']} ({col['data_type']}){pk_suffix}")
 
             matching_tables = {}
             for t_name, cols in tables_map.items():
@@ -123,17 +206,19 @@ def render_sidebar_view() -> str:
             if not matching_tables:
                 st.sidebar.info("No matching tables or columns found.")
             else:
-                for t_name, cols in matching_tables.items():
-                    col_count = len(cols)
-                    with st.sidebar.expander(f"Table: {t_name} ({col_count} cols)"):
-                        for c_desc in cols:
-                            st.write(f"- {c_desc}")
+                # Use a custom key container for Explorer items to style them
+                with st.sidebar.container(key="schema_explorer_tree_wrapper"):
+                    for t_name, cols in matching_tables.items():
+                          col_count = len(cols)
+                          with st.expander(f"📁  {t_name} ({col_count})", expanded=False):
+                              for c_desc in cols:
+                                  st.markdown(f"<div class='schema-column-node'># {c_desc}</div>", unsafe_allow_html=True)
     else:
         st.sidebar.error("Failed to load schema cache.")
 
     # 2. Paginated Sidebar History
     st.sidebar.markdown("---")
-    st.sidebar.write("#### Query History")
+    st.sidebar.markdown("<div style='font-size: 11px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;'>Query History</div>", unsafe_allow_html=True)
     
     current_page = st.session_state.get(KEY_HISTORY_PAGE, 1)
     limit = 5
@@ -144,59 +229,61 @@ def render_sidebar_view() -> str:
         if not hist_logs:
             st.sidebar.info("No query logs on this page.")
         else:
-            for idx, log in enumerate(hist_logs):
-                q_text = log.get("question") or ""
-                if q_text == "Manual SQL Editor Query" or not q_text.strip():
-                    q_preview = f"SQL: {log.get('sql_query')[:20]}..."
-                else:
-                    q_preview = q_text[:25] + "..." if len(q_text) > 25 else q_text
+            with st.sidebar.container(key="sidebar_query_history_wrapper"):
+                for idx, log in enumerate(hist_logs):
+                    q_text = log.get("question") or ""
+                    if q_text == "Manual SQL Editor Query" or not q_text.strip():
+                        q_preview = f"SQL: {log.get('sql_query')[:20]}..."
+                    else:
+                        q_preview = q_text[:25] + "..." if len(q_text) > 25 else q_text
 
-                hist_btn_key = f"sidebar_hist_btn_{log['id']}_{idx}"
-                current_sql = st.session_state.get(KEY_WORKBENCH_SQL, "")
+                    hist_btn_key = f"sidebar_hist_btn_{log['id']}_{idx}"
+                    current_sql = st.session_state.get(KEY_WORKBENCH_SQL, "")
 
-                # Warn user if overwriting custom edits
-                has_custom_sql = (
-                    current_sql.strip()
-                    and current_sql != "SELECT * FROM <table_name> LIMIT 10"
-                    and current_sql != log.get("sql_query")
-                )
+                    # Warn user if overwriting custom edits
+                    has_custom_sql = (
+                        current_sql.strip()
+                        and current_sql != "SELECT * FROM <table_name> LIMIT 10"
+                        and current_sql != log.get("sql_query")
+                    )
 
-                if has_custom_sql:
-                    st.sidebar.write(f"*{q_preview}*")
-                    confirm_overwrite = st.sidebar.checkbox("Confirm Overwrite", key=f"overwrite_chk_{log['id']}_{idx}")
-                    if st.sidebar.button("Restore Query", key=hist_btn_key):
-                        if confirm_overwrite:
+                    st.markdown(f"<div class='history-item-preview'>📝 {q_preview}</div>", unsafe_allow_html=True)
+                    
+                    if has_custom_sql:
+                        confirm_overwrite = st.sidebar.checkbox("Confirm Overwrite", key=f"overwrite_chk_{log['id']}_{idx}")
+                        if st.sidebar.button("Restore", key=hist_btn_key, use_container_width=True):
+                            if confirm_overwrite:
+                                st.session_state[KEY_WORKBENCH_SQL] = log.get("sql_query")
+                                st.session_state["workbench_sql_text_area"] = log.get("sql_query")
+                                # If manual query, restore to Workbench tab, otherwise Copilot tab
+                                st.session_state[KEY_ACTIVE_TAB] = "SQL Workbench" if q_text == "Manual SQL Editor Query" or not q_text.strip() else "AI Copilot"
+                                st.sidebar.success("Query restored!")
+                                st.rerun()
+                            else:
+                                st.sidebar.warning("Confirmation required.")
+                    else:
+                        if st.sidebar.button("Restore Query", key=hist_btn_key, use_container_width=True):
                             st.session_state[KEY_WORKBENCH_SQL] = log.get("sql_query")
                             st.session_state["workbench_sql_text_area"] = log.get("sql_query")
-                            # If manual query, restore to Workbench tab, otherwise Copilot tab
                             st.session_state[KEY_ACTIVE_TAB] = "SQL Workbench" if q_text == "Manual SQL Editor Query" or not q_text.strip() else "AI Copilot"
                             st.sidebar.success("Query restored!")
                             st.rerun()
-                        else:
-                            st.sidebar.warning("Confirmation check required.")
-                else:
-                    if st.sidebar.button(q_preview, key=hist_btn_key):
-                        st.session_state[KEY_WORKBENCH_SQL] = log.get("sql_query")
-                        st.session_state["workbench_sql_text_area"] = log.get("sql_query")
-                        st.session_state[KEY_ACTIVE_TAB] = "SQL Workbench" if q_text == "Manual SQL Editor Query" or not q_text.strip() else "AI Copilot"
-                        st.sidebar.success("Query restored!")
-                        st.rerun()
 
             # Pagination control buttons layout
             st.sidebar.write("")
-            col_prev, col_num, col_next = st.sidebar.columns([2, 2, 2])
+            col_prev, col_num, col_next = st.sidebar.columns([1, 1, 1])
             
             with col_prev:
                 if current_page > 1:
-                    if st.button("« Prev", key="history_prev_page_btn"):
+                    if st.button("«", key="history_prev_page_btn", use_container_width=True):
                         st.session_state[KEY_HISTORY_PAGE] = current_page - 1
                         st.rerun()
             with col_num:
-                st.write(f"Page {current_page}")
+                st.markdown(f"<div style='text-align: center; line-height: 32px; font-size: 12px; color: #94A3B8;'>{current_page}</div>", unsafe_allow_html=True)
             with col_next:
                 # Show "Next" only if a full page was returned, indicating more records likely exist
                 if len(hist_logs) == limit:
-                    if st.button("Next »", key="history_next_page_btn"):
+                    if st.button("»", key="history_next_page_btn", use_container_width=True):
                         st.session_state[KEY_HISTORY_PAGE] = current_page + 1
                         st.rerun()
     else:
@@ -205,7 +292,7 @@ def render_sidebar_view() -> str:
     st.sidebar.markdown("---")
     
     # Log out
-    if st.sidebar.button("Log Out"):
+    if st.sidebar.button("Log Out", key="sidebar_logout_btn", use_container_width=True):
         with st.spinner("Logging out..."):
             api_client.logout(token)
         clear_session_state()

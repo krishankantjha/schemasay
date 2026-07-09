@@ -156,3 +156,187 @@ button[kind="primary"]:hover {
     font-weight: 700;
     margin: 0;
 }
+
+/* Sidebar Header Logo */
+.sidebar-logo-bar {
+    padding: 10px 0 20px 0;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 20px;
+}
+.sidebar-logo-bar .logo-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.03em;
+}
+.sidebar-logo-bar .logo-accent {
+    color: #60A5FA;
+}
+
+/* User Profile Card */
+.sidebar-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 20px;
+}
+.sidebar-profile-card .avatar-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+    letter-spacing: -0.01em;
+}
+.sidebar-profile-card .profile-info {
+    overflow: hidden;
+}
+.sidebar-profile-card .profile-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: #FFFFFF;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.sidebar-profile-card .profile-email {
+    font-size: 11px;
+    color: #64748B;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* Sidebar Navigation Buttons */
+.st-key-sidebar_navigation_menu button {
+    background-color: transparent !important;
+    border: 1px solid transparent !important;
+    border-radius: 8px !important;
+    color: #94A3B8 !important;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+    text-align: left !important;
+    padding: 8px 12px !important;
+    transition: var(--transition-fast) !important;
+    margin-bottom: 6px !important;
+    justify-content: flex-start !important;
+}
+.st-key-sidebar_navigation_menu button:hover {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    color: #FFFFFF !important;
+}
+/* Style active state nav button */
+.st-key-sidebar_navigation_menu button[kind="primary"] {
+    background-color: rgba(37, 99, 235, 0.15) !important;
+    border: 1px solid rgba(37, 99, 235, 0.3) !important;
+    color: #60A5FA !important;
+    font-weight: 600 !important;
+}
+
+/* Active Database Connection Card */
+.active-connection-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 10px;
+}
+.active-connection-card .conn-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.active-connection-card .conn-status {
+    font-size: 10px;
+    color: #10B981;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.active-connection-card .conn-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: #FFFFFF;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.active-connection-card .conn-host {
+    font-size: 10px;
+    color: #64748B;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Schema Explorer Tree Nodes */
+.st-key-schema_explorer_tree_wrapper .streamlit-expanderHeader {
+    background-color: transparent !important;
+    color: #E2E8F0 !important;
+    border: none !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding: 6px 8px !important;
+}
+.st-key-schema_explorer_tree_wrapper .streamlit-expanderHeader:hover {
+    color: #FFFFFF !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+.st-key-schema_explorer_tree_wrapper .schema-column-node {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #94A3B8;
+    padding: 4px 12px;
+}
+
+/* Query History compact list */
+.history-item-preview {
+    font-size: 12px;
+    color: #E2E8F0;
+    font-weight: 500;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.st-key-sidebar_query_history_wrapper button {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: #94A3B8 !important;
+    font-size: 11px !important;
+    padding: 4px 8px !important;
+    height: auto !important;
+}
+.st-key-sidebar_query_history_wrapper button:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: #FFFFFF !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Global scrollbars for sidebar */
+section[data-testid="stSidebar"] ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+section[data-testid="stSidebar"] ::-webkit-scrollbar-track {
+    background: transparent;
+}
+section[data-testid="stSidebar"] ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+section[data-testid="stSidebar"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
