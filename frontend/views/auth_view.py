@@ -40,7 +40,7 @@ def show_auth_page():
         }
 
         /* Center container wrapper */
-        div[data-testid="stVerticalBlockBorderWrapper"] {
+        div.stVerticalBlockBorderWrapper {
             background-color: #FFFFFF !important;
             border: 1px solid #E7EDF8 !important;
             border-radius: 30px !important;
@@ -57,28 +57,24 @@ def show_auth_page():
         }
 
         /* Left Column: branding sidebar panel */
-        div[data-testid="column"]:nth-child(1) {
+        div.stVerticalBlockBorderWrapper div[data-testid="column"]:first-child {
             background: linear-gradient(135deg, #061543 0%, #0B2C82 100%) !important;
             color: #FFFFFF !important;
             border-radius: 30px 0 0 30px !important;
             overflow: hidden !important;
         }
 
-        /* Right Column: authentication form panel (targeted at child 3 due to Streamlit's spacer) */
-        div[data-testid="column"]:nth-child(3),
-        div[data-testid="column"]:last-child {
+        /* Right Column: authentication form panel */
+        div.stVerticalBlockBorderWrapper div[data-testid="column"]:last-child {
             padding: 45px 50px !important;
             background-color: #FFFFFF !important;
             border-radius: 0 30px 30px 0 !important;
         }
 
         /* Force dark text for visibility in the white right column panel */
-        div[data-testid="column"]:nth-child(3) h3,
-        div[data-testid="column"]:nth-child(3) p,
-        div[data-testid="column"]:nth-child(3) span,
-        div[data-testid="column"]:last-child h3,
-        div[data-testid="column"]:last-child p,
-        div[data-testid="column"]:last-child span {
+        div.stVerticalBlockBorderWrapper div[data-testid="column"]:last-child h3,
+        div.stVerticalBlockBorderWrapper div[data-testid="column"]:last-child p,
+        div.stVerticalBlockBorderWrapper div[data-testid="column"]:last-child span {
             color: #111827 !important;
         }
 
