@@ -51,7 +51,11 @@ def show_auth_page():
             padding: 0 !important;
             overflow: hidden !important;
             max-width: 1040px !important;
-            margin: 0 auto !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            margin: 0 !important;
         }
 
         /* Make columns layout flush */
