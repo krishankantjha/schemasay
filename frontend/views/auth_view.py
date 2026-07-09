@@ -198,8 +198,11 @@ def show_auth_page():
             flex: none !important;
             padding: 0 !important;
         }
-        .st-key-signup_row_container div[data-testid="stButton"] button,
-        .st-key-signin_row_container div[data-testid="stButton"] button {
+        /* Direct widget-key selectors for absolute styling control */
+        .st-key-toggle_to_signup button,
+        .st-key-toggle_to_login button,
+        div[class*="toggle_to_signup"] button,
+        div[class*="toggle_to_login"] button {
             background-color: transparent !important;
             border: none !important;
             color: #4169E1 !important;
@@ -211,8 +214,10 @@ def show_auth_page():
             height: 32px !important;
             line-height: 32px !important;
         }
-        .st-key-signup_row_container button:hover,
-        .st-key-signin_row_container button:hover {
+        .st-key-toggle_to_signup button:hover,
+        .st-key-toggle_to_login button:hover,
+        div[class*="toggle_to_signup"] button:hover,
+        div[class*="toggle_to_login"] button:hover {
             color: #2F5DD7 !important;
             text-decoration: underline !important;
             background-color: transparent !important;
