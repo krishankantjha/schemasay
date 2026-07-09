@@ -103,6 +103,24 @@ def show_auth_page():
             box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.15) !important;
         }
         
+        /* Force placeholder text to be visible and high-contrast in white inputs */
+        div[data-testid="stTextInput"] input::placeholder {
+            color: #64748B !important;
+            opacity: 1 !important;
+        }
+        div[data-testid="stTextInput"] input::-webkit-input-placeholder {
+            color: #64748B !important;
+            opacity: 1 !important;
+        }
+        div[data-testid="stTextInput"] input::-moz-placeholder {
+            color: #64748B !important;
+            opacity: 1 !important;
+        }
+        div[data-testid="stTextInput"] input:-ms-input-placeholder {
+            color: #64748B !important;
+            opacity: 1 !important;
+        }
+        
         /* Inject background envelope icon in Email inputs */
         div[data-testid="stTextInput"]:has(input[placeholder*="email"]) input {
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236B7280"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>') !important;
