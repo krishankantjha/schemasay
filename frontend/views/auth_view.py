@@ -6,6 +6,71 @@ def show_auth_page():
     Displays the login and registration screen with a product pitch sidebar.
     Uses session state to switch between login and signup forms on the right side.
     """
+    # Force mockups visual fidelity (override Streamlit dark theme values for this card)
+    st.markdown(
+        """
+        <style>
+        /* Force outer container card to be clean white with rounded corners */
+        div[data-testid="stVerticalBlockBorderWrapper"] {
+            background-color: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+        
+        /* Make columns layout flush */
+        div[data-testid="column"] {
+            padding: 0 !important;
+        }
+
+        /* Form side wrapper padding */
+        div[data-testid="column"]:nth-child(2) {
+            padding: 2.25rem 2rem !important;
+            background-color: #FFFFFF !important;
+        }
+
+        /* Input field formatting */
+        div[data-testid="stTextInput"] input {
+            background-color: #FFFFFF !important;
+            color: #0F172A !important;
+            border: 1px solid #CBD5E1 !important;
+            border-radius: 8px !important;
+            padding: 0.5rem 0.75rem !important;
+        }
+        div[data-testid="stTextInput"] input:focus {
+            border-color: #2563EB !important;
+            box-shadow: 0 0 0 1px #2563EB !important;
+        }
+        div[data-testid="stTextInput"] label {
+            color: #334155 !important;
+            font-weight: 600 !important;
+            font-size: 0.85rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        /* Toggle button styles to look like simple blue links */
+        div[data-testid="element-container"] button[p-base="secondary"] {
+            background-color: transparent !important;
+            border: none !important;
+            color: #2563EB !important;
+            box-shadow: none !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            margin: 0 auto !important;
+            display: block !important;
+        }
+        div[data-testid="element-container"] button[p-base="secondary"]:hover {
+            color: #1D4ED8 !important;
+            text-decoration: underline !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     # Initialize session state for switching auth modes
     if "auth_mode" not in st.session_state:
         st.session_state["auth_mode"] = "login"
