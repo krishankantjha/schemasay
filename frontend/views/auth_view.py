@@ -54,11 +54,22 @@ def show_auth_page():
             overflow: hidden !important;
         }
 
-        /* Right Column: authentication form panel */
-        div[data-testid="column"]:nth-child(2) {
+        /* Right Column: authentication form panel (targeted at child 3 due to Streamlit's spacer) */
+        div[data-testid="column"]:nth-child(3),
+        div[data-testid="column"]:last-child {
             padding: 45px 50px !important;
             background-color: #FFFFFF !important;
             border-radius: 0 30px 30px 0 !important;
+        }
+
+        /* Force dark text for visibility in the white right column panel */
+        div[data-testid="column"]:nth-child(3) h3,
+        div[data-testid="column"]:nth-child(3) p,
+        div[data-testid="column"]:nth-child(3) span,
+        div[data-testid="column"]:last-child h3,
+        div[data-testid="column"]:last-child p,
+        div[data-testid="column"]:last-child span {
+            color: #111827 !important;
         }
 
         /* Text Input controls overrides */
@@ -70,10 +81,11 @@ def show_auth_page():
         }
         div[data-testid="stTextInput"] input {
             height: 52px !important;
+            background-color: #FFFFFF !important;
+            color: #111827 !important;
             border: 1.5px solid #D9E3F5 !important;
             border-radius: 12px !important;
             font-size: 14px !important;
-            color: #111827 !important;
             outline: none !important;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
         }
@@ -110,7 +122,7 @@ def show_auth_page():
         }
 
         /* Style the Login / Submit button */
-        div[data-testid="stButton"] button[p-base="primary"] {
+        div[data-testid="stButton"] button[kind="primary"] {
             height: 54px !important;
             background-color: #4169E1 !important;
             color: #FFFFFF !important;
@@ -122,14 +134,14 @@ def show_auth_page():
             transition: all 0.2s ease-in-out !important;
             width: 100% !important;
         }
-        div[data-testid="stButton"] button[p-base="primary"]:hover {
+        div[data-testid="stButton"] button[kind="primary"]:hover {
             background-color: #2F5DD7 !important;
             transform: translateY(-1px) !important;
             box-shadow: 0 6px 12px rgba(65, 105, 225, 0.3) !important;
         }
 
         /* Style the Toggle Auth state buttons to look like clean blue text links */
-        div[data-testid="stButton"] button[p-base="secondary"] {
+        div[data-testid="stButton"] button[kind="secondary"] {
             background-color: transparent !important;
             border: none !important;
             color: #4169E1 !important;
@@ -140,7 +152,7 @@ def show_auth_page():
             margin: 0 auto !important;
             display: block !important;
         }
-        div[data-testid="stButton"] button[p-base="secondary"]:hover {
+        div[data-testid="stButton"] button[kind="secondary"]:hover {
             color: #2F5DD7 !important;
             text-decoration: underline !important;
             background-color: transparent !important;
