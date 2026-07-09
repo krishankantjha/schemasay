@@ -20,6 +20,16 @@ def show_auth_page():
             overflow: hidden !important;
         }
 
+        /* Collapse Streamlit default top/bottom padding to center card vertically */
+        div[data-testid="block-container"] {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            height: 100vh !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
         /* Hide standard header, footer, and menu */
         #MainMenu, footer, header, [data-testid="stHeader"] {
             display: none !important;
