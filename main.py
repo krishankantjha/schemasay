@@ -33,20 +33,16 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 4. Left Sidebar Navigation Panel Structure (HTML)
+# 4. Left Sidebar Navigation Panel Structure
+active_view = st.sidebar.selectbox(
+    "Navigation Screen",
+    ["Dashboard", "Database Connections", "Spreadsheet Upload"],
+    index=0
+)
+
 st.sidebar.markdown(
     """
     <div class="sidebar-links-wrapper">
-        <div class="sidebar-link active"><span class="sidebar-link-icon">🏠</span> Dashboard</div>
-        <div class="sidebar-link"><span class="sidebar-link-icon">📁</span> Connections</div>
-        <div class="sidebar-link"><span class="sidebar-link-icon">📤</span> Upload File</div>
-        <div class="sidebar-link"><span class="sidebar-link-icon">🔍</span> Schema Explorer</div>
-        <div class="sidebar-link"><span class="sidebar-link-icon">💬</span> AI Copilot</div>
-        <div class="sidebar-link"><span class="sidebar-link-icon">💻</span> SQL Workbench</div>
-        <div class="sidebar-link"><span class="sidebar-link-icon">📜</span> Query History</div>
-        <div class="sidebar-link"><span class="sidebar-link-icon">📊</span> Visualizations</div>
-        <div class="sidebar-link"><span class="sidebar-link-icon">📋</span> Results</div>
-        <div class="sidebar-link"><span class="sidebar-link-icon">💡</span> Insights</div>
         <div class="sidebar-link-divider"></div>
         <div class="sidebar-link"><span class="sidebar-link-icon">⚙️</span> Settings</div>
         <div class="sidebar-link"><span class="sidebar-link-icon">❓</span> Help</div>
@@ -55,6 +51,217 @@ st.sidebar.markdown(
     """,
     unsafe_allow_html=True
 )
+
+if active_view == "Database Connections":
+    st.markdown(
+        """
+        <div class="connections-page-wrapper fade-in" style="padding: 0 var(--spacing-6) var(--spacing-8) var(--spacing-6);">
+            <div class="page-header-row" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                <div>
+                    <h1 class="font-h1" style="color: var(--color-text-primary); margin: 0;">Database Connections</h1>
+                    <p class="text-subtitle" style="margin: 4px 0 0 0;">Create and manage your active database connection parameters.</p>
+                </div>
+                <button class="btn-base btn-primary">+ Create Connection</button>
+            </div>
+            
+            <div class="connections-toolbar" style="display: flex; gap: var(--spacing-4); margin-bottom: 24px;">
+                <input type="text" class="connections-search-input" placeholder="🔍 Search connections..." style="flex-grow: 1;" />
+                <select class="pagination-select" style="padding: 8px 14px;">
+                    <option>All Databases</option>
+                    <option>PostgreSQL</option>
+                    <option>MySQL</option>
+                    <option>SQLite</option>
+                </select>
+            </div>
+            
+            <div class="connections-grid">
+                <!-- Card 1: Postgres -->
+                <div class="connection-card card-postgres">
+                    <div class="connection-card-header">
+                        <div class="db-logo-wrapper logo-postgres">PG</div>
+                        <div class="connection-status badge-base badge-success">Connected</div>
+                    </div>
+                    <h3 class="font-h3 connection-name">pg_sales_production</h3>
+                    <div class="connection-details">
+                        <div class="detail-row"><span class="detail-label">Host:</span> <span class="detail-value">aws-rds-sales.rds.amazonaws.com</span></div>
+                        <div class="detail-row"><span class="detail-label">Port:</span> <span class="detail-value">5432</span></div>
+                        <div class="detail-row"><span class="detail-label">Database:</span> <span class="detail-value">sales_prod</span></div>
+                        <div class="detail-row"><span class="detail-label">Username:</span> <span class="detail-value">sales_admin</span></div>
+                    </div>
+                    <div class="connection-card-footer">
+                        <span class="last-used-label">Last used: 2 mins ago</span>
+                        <div class="action-buttons-group">
+                            <button class="connection-action-btn">Edit</button>
+                            <button class="connection-action-btn btn-danger-action">Delete</button>
+                            <button class="btn-base btn-secondary btn-sm">Test Connection</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card 2: MySQL -->
+                <div class="connection-card card-mysql">
+                    <div class="connection-card-header">
+                        <div class="db-logo-wrapper logo-mysql">MY</div>
+                        <div class="connection-status badge-base badge-success">Connected</div>
+                    </div>
+                    <h3 class="font-h3 connection-name">mysql_orders_staging</h3>
+                    <div class="connection-details">
+                        <div class="detail-row"><span class="detail-label">Host:</span> <span class="detail-value">staging-mysql.orders.net</span></div>
+                        <div class="detail-row"><span class="detail-label">Port:</span> <span class="detail-value">3306</span></div>
+                        <div class="detail-row"><span class="detail-label">Database:</span> <span class="detail-value">staging_orders</span></div>
+                        <div class="detail-row"><span class="detail-label">Username:</span> <span class="detail-value">stage_reader</span></div>
+                    </div>
+                    <div class="connection-card-footer">
+                        <span class="last-used-label">Last used: Yesterday</span>
+                        <div class="action-buttons-group">
+                            <button class="connection-action-btn">Edit</button>
+                            <button class="connection-action-btn btn-danger-action">Delete</button>
+                            <button class="btn-base btn-secondary btn-sm">Test Connection</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: SQLite -->
+                <div class="connection-card card-sqlite">
+                    <div class="connection-card-header">
+                        <div class="db-logo-wrapper logo-sqlite">SL</div>
+                        <div class="connection-status badge-base badge-success">Connected</div>
+                    </div>
+                    <h3 class="font-h3 connection-name">sqlite_local_cache</h3>
+                    <div class="connection-details">
+                        <div class="detail-row"><span class="detail-label">File Path:</span> <span class="detail-value">/data/local_cache.db</span></div>
+                        <div class="detail-row"><span class="detail-label">Database:</span> <span class="detail-value">sqlite_db</span></div>
+                        <div class="detail-row"><span class="detail-label">Mode:</span> <span class="detail-value">Read-Write</span></div>
+                        <div class="detail-row"><span class="detail-label">Size:</span> <span class="detail-value">24.5 MB</span></div>
+                    </div>
+                    <div class="connection-card-footer">
+                        <span class="last-used-label">Last used: 3 days ago</span>
+                        <div class="action-buttons-group">
+                            <button class="connection-action-btn">Edit</button>
+                            <button class="connection-action-btn btn-danger-action">Delete</button>
+                            <button class="btn-base btn-secondary btn-sm">Test Connection</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Connection test states panel details -->
+            <div class="workspace-card" style="margin-top: 30px;">
+                <div class="card-header-row" style="margin-bottom: 16px;">
+                    <div class="card-header-title">Connection Status Tester</div>
+                </div>
+                <div class="tester-panels-grid">
+                    <!-- Testing -->
+                    <div class="test-state-box">
+                        <div class="test-state-spinner"></div>
+                        <div class="test-state-text">Testing connection details for pg_sales_production...</div>
+                    </div>
+                    <!-- Success -->
+                    <div class="test-state-box test-state-success">
+                        <span class="test-state-icon">✔</span>
+                        <div class="test-state-text">Connection verified successfully! (Latency: 14 ms)</div>
+                    </div>
+                    <!-- Failed -->
+                    <div class="test-state-box test-state-failed">
+                        <span class="test-state-icon">✘</span>
+                        <div class="test-state-text">Connection failed: Connection timed out. Please check Host and Port.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.stop()
+
+if active_view == "Spreadsheet Upload":
+    st.markdown(
+        """
+        <div class="upload-page-wrapper fade-in" style="padding: 0 var(--spacing-6) var(--spacing-8) var(--spacing-6);">
+            <div class="page-header-row" style="margin-bottom: 24px;">
+                <div>
+                    <h1 class="font-h1" style="color: var(--color-text-primary); margin: 0;">Spreadsheet Upload</h1>
+                    <p class="text-subtitle" style="margin: 4px 0 0 0;">Upload CSV or Excel spreadsheets to parse schemas and auto-ingest into memory cache.</p>
+                </div>
+            </div>
+            
+            <div class="upload-grid">
+                <!-- Left: Drag and Drop -->
+                <div class="workspace-card dropzone-card">
+                    <div class="upload-dropzone">
+                        <div class="upload-cloud-icon">☁</div>
+                        <h3 class="font-h3" style="margin: 12px 0 6px 0; color: var(--color-text-primary);">Drag and drop your spreadsheet here</h3>
+                        <p class="text-caption" style="margin-bottom: 16px;">Supported formats: CSV, XLSX, XLS (Max size: 50MB)</p>
+                        <button class="btn-base btn-primary">Browse Files</button>
+                    </div>
+                </div>
+                
+                <!-- Right: Status / Progress -->
+                <div class="workspace-card upload-status-card">
+                    <div class="card-header-row" style="margin-bottom: 16px;">
+                        <div class="card-header-title">Ingestion Pipeline Progress</div>
+                    </div>
+                    
+                    <!-- Progress Bar 1 -->
+                    <div class="progress-item-wrapper">
+                        <div class="progress-meta">
+                            <span class="progress-status-title">Uploading sales_january_2026.csv</span>
+                            <span class="progress-percentage">84%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: 84%;"></div>
+                        </div>
+                        <div class="progress-cancel-row">
+                            <span class="text-caption">12.4 MB of 14.8 MB uploaded</span>
+                            <span class="cancel-upload-trigger">Cancel</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Bar 2 -->
+                    <div class="progress-item-wrapper" style="margin-top: 20px;">
+                        <div class="progress-meta">
+                            <span class="progress-status-title">Validating schema structure...</span>
+                            <span class="progress-percentage">98%</span>
+                        </div>
+                        <div class="progress-track track-success">
+                            <div class="progress-fill fill-success" style="width: 98%;"></div>
+                        </div>
+                        <div class="progress-cancel-row">
+                            <span class="text-caption">Checking column types and constraints</span>
+                            <span class="cancel-upload-trigger">Cancel</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="upload-outcome-grid" style="margin-top: 30px;">
+                <!-- Success Outcome -->
+                <div class="workspace-card outcome-success-card">
+                    <span class="outcome-icon success-icon">✔</span>
+                    <h3 class="font-h3" style="margin: 12px 0 6px 0; color: var(--color-success);">Upload Successful!</h3>
+                    <p class="text-body" style="text-align: center; color: var(--color-text-secondary); margin-bottom: 16px;">
+                        Spreadsheet <strong>sales_january_2026.csv</strong> was successfully imported.<br/>
+                        Parsed <strong>12,483 rows</strong> across <strong>8 columns</strong>. Created table <strong>sales_jan_2026</strong>.
+                    </p>
+                    <button class="btn-base btn-success">Ingest Table and Query</button>
+                </div>
+                
+                <!-- Error Outcome -->
+                <div class="workspace-card outcome-failed-card">
+                    <span class="outcome-icon error-icon">✘</span>
+                    <h3 class="font-h3" style="margin: 12px 0 6px 0; color: var(--color-danger);">Upload Ingestion Failed</h3>
+                    <p class="text-body" style="text-align: center; color: var(--color-text-secondary); margin-bottom: 16px;">
+                        Ingestion pipeline failed on step: <strong>Schema Conversion</strong>.<br/>
+                        Reason: <em>Malformed encoding structure found on line 4,821. Expected UTF-8 compatible format.</em>
+                    </p>
+                    <button class="btn-base btn-danger">Upload Another File</button>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.stop()
 
 # 5. Proportional Three-Column Content Wrapper Grid
 col_left, col_center, col_right = st.columns([1.2, 3.2, 1.3], gap="medium")
