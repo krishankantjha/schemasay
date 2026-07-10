@@ -15,6 +15,7 @@ import streamlit as st
 from api_client import api_client
 from views.auth_view import show_auth_page
 from state import KEY_TOKEN, KEY_REFRESH_TOKEN, init_session_state
+from services.state_manager import init_application_states
 
 # ── Page Configuration ────────────────────────────────────────────────────────
 st.set_page_config(
@@ -36,6 +37,7 @@ _load_css("globals.css")
 
 # ── Session State Initialization ──────────────────────────────────────────────
 init_session_state()
+init_application_states()
 
 # ── Auth Gate ─────────────────────────────────────────────────────────────────
 if KEY_TOKEN not in st.session_state:
@@ -62,26 +64,132 @@ if response.status_code == 200:
     elif len(parts) == 1 and len(parts[0]) >= 2:
         initials = parts[0][:2].upper()
 
+    # ── Action Bus Event Interceptor ──────────────────────────────────────────
+    if "action" in st.query_params:
+        action = st.query_params["action"]
+        
+        # Toggle sidebar collapse
+        if action == "toggle_sidebar":
+            from utils.helpers import toggle_sidebar
+            toggle_sidebar()
+        # Toggle light/dark theme preference
+        elif action == "toggle_theme":
+            from utils.helpers import change_theme
+            change_theme()
+        # Toggles notifications panel dropdown
+        elif action == "toggle_notifications":
+            st.session_state.notifications_open = not st.session_state.notifications_open
+            st.session_state.profile_open = False
+        # Toggles profile details dropdown
+        elif action == "toggle_profile":
+            st.session_state.profile_open = not st.session_state.profile_open
+            st.session_state.notifications_open = False
+        # Toggles inline global search bar display
+        elif action == "toggle_search":
+            st.session_state.search_open = not st.session_state.search_open
+        # Clears all unread badges from notifications
+        elif action == "mark_read":
+            from services.notification_service import mark_all_as_read
+            mark_all_as_read()
+            st.session_state.notifications_open = True
+            
+        # Quick Tip navigation index sets
+        elif action.startswith("tip_"):
+            try:
+                st.session_state.current_tip_index = int(action[4:])
+            except Exception:
+                pass
+                
+        # Sidebar primary menu navigation links
+        elif action.startswith("nav_"):
+            page = action[4:]
+            st.session_state.selected_sidebar_item = page
+            # Close popup overlays on navigate
+            st.session_state.notifications_open = False
+            st.session_state.profile_open = False
+            st.session_state.search_open = False
+            
+        # Logout triggers
+        elif action == "logout":
+            st.session_state.show_logout_dialog = True
+            st.session_state.profile_open = False
+        elif action == "confirm_logout":
+            from state import clear_session_state
+            clear_session_state()
+            st.session_state.show_logout_dialog = False
+            st.query_params.clear()
+            st.rerun()
+        elif action == "cancel_logout":
+            st.session_state.show_logout_dialog = False
+            
+        st.query_params.pop("action", None)
+        st.rerun()
+
     # Load layout stylesheets
     _load_css("sidebar.css")
     _load_css("navbar.css")
     _load_css("dashboard_layout.css")
     _load_css("schemasay_ai.css")
     
-    # Extract tip index query param to enable dynamic quick tip rotation
-    active_tip = 0
-    try:
-        if "tip" in st.query_params:
-            active_tip = int(st.query_params["tip"])
-    except Exception:
-        pass
+    # ── Dynamic Theme Colors Override ─────────────────────────────────────────
+    if st.session_state.get("theme") == "dark":
+        st.markdown(
+            """
+            <style>
+            :root {
+                --color-bg-app: #0B0F19 !important;      /* Slate 950 dark background */
+                --color-bg-card: #1E293B !important;     /* Slate 800 card */
+                --color-border: #334155 !important;      /* Slate 700 borders */
+                --color-text-primary: #F8FAFC !important;/* Light text */
+                --color-text-secondary: #94A3B8 !important;
+                --color-text-muted: #64748B !important;
+                --color-bg-input: #0F172A !important;
+            }
+            /* Native Streamlit border card backgrounds */
+            div[data-testid="stVerticalBlockBorderWrapper"] {
+                background-color: var(--color-bg-card) !important;
+                border-color: var(--color-border) !important;
+            }
+            /* Text inputs override */
+            div[data-testid="stTextArea"] textarea {
+                background-color: var(--color-bg-input) !important;
+                border-color: var(--color-border) !important;
+                color: var(--color-text-primary) !important;
+            }
+            /* Code editor border preview */
+            .sql-preview-container {
+                border-color: var(--color-border) !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+    # ── Dynamic Header Title Mapping ──────────────────────────────────────────
+    PAGE_TITLES = {
+        "dashboard": "Dashboard",
+        "connections": "Connections",
+        "upload": "Upload File",
+        "schema": "Schema Explorer",
+        "schemasay_ai": "SchemaSay AI",
+        "workbench": "SQL Workbench",
+        "history": "Query History",
+        "visualizations": "Visualizations",
+        "results": "Results",
+        "insights": "Insights",
+        "settings": "Settings",
+        "help": "Help"
+    }
+    active_nav_id = st.session_state.get("selected_sidebar_item", "dashboard")
+    page_title = PAGE_TITLES.get(active_nav_id, "Dashboard")
 
     from components.sidebar import render_sidebar
     from components.navbar import render_navbar
     from components.schemasay_ai import render_ai_copilot_panel
     
+    active_tip = st.session_state.get("current_tip_index", 0)
     sidebar_content = render_sidebar(active_tip).replace("\n", "")
-    navbar_content = render_navbar(title="Dashboard", display_name=display_name, initials=initials).replace("\n", "")
+    navbar_content = render_navbar(title=page_title, display_name=display_name, initials=initials).replace("\n", "")
     
     # ── 1. Render Navigation & Headers ────────────────────────────────────────
     # Render custom styled sidebar inside Streamlit's native sidebar structure
@@ -90,7 +198,23 @@ if response.status_code == 200:
     # Render Top Navbar sticky at the top of main content block
     st.markdown(navbar_content, unsafe_allow_html=True)
     
-    # ── 2. Render Main Grid Canvas ───────────────────────────────────────────
+    # ── 2. Render Confirm Logout Dialogue Modal ──────────────────────────────
+    if st.session_state.get("show_logout_dialog", False):
+        st.markdown(
+            '<div style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.65); display:flex; align-items:center; justify-content:center; z-index:999999;">'
+            '<div style="background:var(--color-bg-card); padding:24px; border-radius:12px; border:1px solid var(--color-border); box-shadow:var(--shadow-lg); width:320px; display:flex; flex-direction:column; gap:16px;">'
+            '<div style="font-family:var(--font-display); font-weight:700; font-size:15px; color:var(--color-text-primary);">Confirm Logout</div>'
+            '<div style="font-size:12px; color:var(--color-text-secondary); line-height:1.5;">Are you sure you want to end your active session and sign out of SchemaSay?</div>'
+            '<div style="display:flex; justify-content:flex-end; gap:8px;">'
+            '<a href="?action=cancel_logout" target="_self" style="padding:6px 14px; background:var(--color-bg-app); border:1px solid var(--color-border); border-radius:8px; text-decoration:none; color:var(--color-text-primary); font-size:11px; font-weight:600; display:inline-block; transition:var(--transition-fast);">Cancel</a>'
+            '<a href="?action=confirm_logout" target="_self" style="padding:6px 14px; background:#EF4444; border-radius:8px; text-decoration:none; color:#FFFFFF; font-size:11px; font-weight:600; display:inline-block; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition:var(--transition-fast);">Log Out</a>'
+            '</div>'
+            '</div>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    
+    # ── 3. Render Main Grid Canvas ───────────────────────────────────────────
     st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
     
     # Row 1: SchemaSay AI & SQL Workbench
