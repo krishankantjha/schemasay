@@ -1,48 +1,35 @@
 /* ==========================================================================
    SCHEMASAY DESIGN SYSTEM — GLOBALS.CSS
    Central repository for CSS variables, reset parameters, typography scale,
-   layout grids, animations, scrollbars, and responsive utilities.
+   Streamlit native element overrides, animations, and utility helpers.
    ========================================================================== */
 
 /* ── 1. CSS VARIABLES ────────────────────────────────────────────────────── */
 :root {
     /* Colors */
-    --color-primary: #2563EB;
-    /* Royal Blue */
-    --color-primary-hover: #1D4ED8;
-    /* Dark Royal Blue */
+    --color-primary: #2563EB;          /* Royal Blue */
+    --color-primary-hover: #1D4ED8;    /* Dark Royal Blue */
     --color-primary-light: rgba(37, 99, 235, 0.08);
     --color-primary-ring: rgba(37, 99, 235, 0.2);
-
-    --color-bg-app: #F8FAFC;
-    /* App Canvas Gray-Blue */
-    --color-bg-sidebar: #0F172A;
-    /* Deep Slate Blue */
-    --color-bg-card: #FFFFFF;
-    /* Pure White */
+    
+    --color-bg-app: #F8FAFC;           /* App Canvas Gray-Blue */
+    --color-bg-sidebar: #0F172A;       /* Deep Slate Blue */
+    --color-bg-card: #FFFFFF;          /* Pure White */
     --color-bg-input: #FFFFFF;
-
-    --color-text-primary: #0F172A;
-    /* Dark Slate Text */
-    --color-text-secondary: #64748B;
-    /* Muted Slate Text */
-    --color-text-muted: #94A3B8;
-    /* Subtle Text */
-    --color-text-inverse: #FFFFFF;
-    /* White Text */
-
-    --color-border: #56759d;
-    /* Subtle Divider Gray */
+    
+    --color-text-primary: #0F172A;     /* Dark Slate Text */
+    --color-text-secondary: #64748B;   /* Muted Slate Text */
+    --color-text-muted: #94A3B8;       /* Subtle Text */
+    --color-text-inverse: #FFFFFF;     /* White Text */
+    
+    --color-border: #E2E8F0;           /* Subtle Divider Gray */
     --color-border-subtle: rgba(255, 255, 255, 0.08);
-
-    --color-success: #10B981;
-    /* Emerald Green */
+    
+    --color-success: #10B981;          /* Emerald Green */
     --color-success-bg: #DCFCE7;
-    --color-warning: #F59E0B;
-    /* Amber Yellow */
+    --color-warning: #F59E0B;          /* Amber Yellow */
     --color-warning-bg: #FEF3C7;
-    --color-danger: #EF4444;
-    /* Rose Red */
+    --color-danger: #EF4444;           /* Rose Red */
     --color-danger-bg: #FEE2E2;
 
     /* Spacing System (Base 4px) */
@@ -91,48 +78,55 @@
     --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── 2. RESET ────────────────────────────────────────────────────────────── */
-*,
-*::before,
-*::after {
+/* ── 2. RESET & STREAMLIT OVERRIDES ──────────────────────────────────────── */
+*, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* Override Streamlit core structures */
-#MainMenu,
-footer,
-header,
-[data-testid="stHeader"],
-[data-testid="stToolbar"] {
+/* Hide standard Streamlit header, footer toolbar and MainMenu */
+#MainMenu, footer, header, [data-testid="stHeader"], [data-testid="stToolbar"] {
     display: none !important;
 }
 
-div[data-testid="block-container"] {
-    padding: 0 !important;
-    max-width: 100% !important;
-}
-
-div[data-testid="stAppViewContainer"],
-.stApp {
+/* Set core app viewport backgrounds and layout limits */
+div[data-testid="stAppViewContainer"], .stApp {
     background-color: var(--color-bg-app) !important;
     overflow: hidden !important;
     height: 100vh !important;
     width: 100vw !important;
 }
 
-/* Disable default outer margins */
-.element-container,
-.stMarkdown {
+/* Eliminate padding on main canvas */
+div[data-testid="block-container"] {
+    padding: 0 !important;
+    max-width: 100% !important;
+    height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-y: auto !important;
+}
+
+/* Override Streamlit sidebar layout dimensions & paddings */
+section[data-testid="stSidebar"] {
+    background-color: var(--color-bg-sidebar) !important;
+    border-right: 1px solid var(--color-border-subtle) !important;
+    width: 260px !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
+    padding: 0 !important;
+}
+
+/* Streamlit elements resets */
+.element-container, .stMarkdown {
     margin: 0 !important;
     padding: 0 !important;
 }
 
 /* ── 3. TYPOGRAPHY ───────────────────────────────────────────────────────── */
-html,
-body,
-[class*="css"] {
+html, body, [class*="css"] {
     font-family: var(--font-sans);
     font-size: var(--font-size-base);
     line-height: var(--line-height-normal);
@@ -140,159 +134,55 @@ body,
     -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display) !important;
     font-weight: var(--font-weight-bold) !important;
     line-height: var(--line-height-tight) !important;
     color: var(--color-text-primary) !important;
 }
 
-h1 {
-    font-size: var(--font-size-xxl) !important;
-}
+h1 { font-size: var(--font-size-xxl) !important; }
+h2 { font-size: var(--font-size-xl) !important; }
+h3 { font-size: var(--font-size-lg) !important; }
+h4 { font-size: var(--font-size-md) !important; }
 
-h2 {
-    font-size: var(--font-size-xl) !important;
-}
-
-h3 {
-    font-size: var(--font-size-lg) !important;
-}
-
-h4 {
-    font-size: var(--font-size-md) !important;
-}
-
-code,
-pre {
+code, pre {
     font-family: var(--font-mono) !important;
     font-size: var(--font-size-sm) !important;
 }
 
-/* ── 4. GLOBAL PAGE LAYOUT ────────────────────────────────────────────────── */
-.app-layout-wrapper {
-    display: flex;
-    flex-direction: row;
-    height: 100vh;
-    width: 100vw;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 999999;
-    overflow: hidden;
-}
-
-.sidebar-container-shell {
-    width: 260px;
-    height: 100%;
-    background-color: var(--color-bg-sidebar);
-    border-right: 1px solid var(--color-border-subtle);
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.main-content-container-shell {
-    flex-grow: 1;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background-color: var(--color-bg-app);
-    overflow: hidden;
-}
-
-/* ── 5. UTILITY CLASSES ───────────────────────────────────────────────────── */
+/* ── 4. UTILITY CLASSES ───────────────────────────────────────────────────── */
 /* Flex Utilities */
-.d-flex {
-    display: flex !important;
-}
+.d-flex { display: flex !important; }
+.flex-row { flex-direction: row !important; }
+.flex-column { flex-direction: column !important; }
+.flex-grow-1 { flex-grow: 1 !important; }
+.flex-shrink-0 { flex-shrink: 0 !important; }
 
-.flex-row {
-    flex-direction: row !important;
-}
+.align-items-center { align-items: center !important; }
+.justify-content-center { justify-content: center !important; }
+.justify-content-between { justify-content: space-between !important; }
+.justify-content-end { justify-content: flex-end !important; }
 
-.flex-column {
-    flex-direction: column !important;
-}
-
-.flex-grow-1 {
-    flex-grow: 1 !important;
-}
-
-.flex-shrink-0 {
-    flex-shrink: 0 !important;
-}
-
-.align-items-center {
-    align-items: center !important;
-}
-
-.justify-content-center {
-    justify-content: center !important;
-}
-
-.justify-content-between {
-    justify-content: space-between !important;
-}
-
-.justify-content-end {
-    justify-content: flex-end !important;
-}
-
-.gap-xs {
-    gap: var(--spacing-xs) !important;
-}
-
-.gap-sm {
-    gap: var(--spacing-sm) !important;
-}
-
-.gap-md {
-    gap: var(--spacing-md) !important;
-}
-
-.gap-lg {
-    gap: var(--spacing-lg) !important;
-}
-
-.gap-xl {
-    gap: var(--spacing-xl) !important;
-}
+.gap-xs { gap: var(--spacing-xs) !important; }
+.gap-sm { gap: var(--spacing-sm) !important; }
+.gap-md { gap: var(--spacing-md) !important; }
+.gap-lg { gap: var(--spacing-lg) !important; }
+.gap-xl { gap: var(--spacing-xl) !important; }
 
 /* Display & Dimensions */
-.w-100 {
-    width: 100% !important;
-}
-
-.h-100 {
-    height: 100% !important;
-}
+.w-100 { width: 100% !important; }
+.h-100 { height: 100% !important; }
 
 /* Overflow Control */
-.overflow-hidden {
-    overflow: hidden !important;
-}
-
-.overflow-y-auto {
-    overflow-y: auto !important;
-}
-
-.overflow-x-auto {
-    overflow-x: auto !important;
-}
+.overflow-hidden { overflow: hidden !important; }
+.overflow-y-auto { overflow-y: auto !important; }
+.overflow-x-auto { overflow-x: auto !important; }
 
 /* Visibility */
-.d-none {
-    display: none !important;
-}
+.d-none { display: none !important; }
 
-/* ── 6. ANIMATION SYSTEM ──────────────────────────────────────────────────── */
+/* ── 5. ANIMATION SYSTEM ──────────────────────────────────────────────────── */
 .transition-all {
     transition: var(--transition-smooth);
 }
@@ -302,7 +192,7 @@ pre {
     box-shadow: var(--shadow-hover);
 }
 
-/* ── 7. SCROLLBAR STYLING ─────────────────────────────────────────────────── */
+/* ── 6. SCROLLBAR STYLING ─────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -319,35 +209,4 @@ pre {
 
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(100, 116, 139, 0.4);
-}
-
-/* ── 8. RESPONSIVE RULES (DESKTOP) ────────────────────────────────────────── */
-@media (max-width: 1920px) {
-    .sidebar-container-shell {
-        width: 260px;
-    }
-}
-
-@media (max-width: 1600px) {
-    .sidebar-container-shell {
-        width: 250px;
-    }
-}
-
-@media (max-width: 1440px) {
-    .sidebar-container-shell {
-        width: 240px;
-    }
-}
-
-@media (max-width: 1366px) {
-    .sidebar-container-shell {
-        width: 230px;
-    }
-}
-
-@media (max-width: 1280px) {
-    .sidebar-container-shell {
-        width: 220px;
-    }
 }

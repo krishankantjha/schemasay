@@ -83,55 +83,57 @@ if response.status_code == 200:
     sidebar_content = render_sidebar(active_tip).replace("\n", "")
     navbar_content = render_navbar(title="Dashboard", display_name=display_name, initials=initials).replace("\n", "")
     
-    # ── 1. Open Layout Containers ─────────────────────────────────────────────
-    # Opens layout wrappers, let Streamlit draw widget columns inside them
-    st.markdown(
-        f'<div class="app-layout-wrapper">'
-        f'<aside class="sidebar-container-shell">{sidebar_content}</aside>'
-        f'<main class="main-content-container-shell">{navbar_content}'
-        f'<div class="dashboard-container">', 
-        unsafe_allow_html=True
-    )
+    # ── 1. Render Navigation & Headers ────────────────────────────────────────
+    # Render custom styled sidebar inside Streamlit's native sidebar structure
+    st.sidebar.markdown(sidebar_content, unsafe_allow_html=True)
     
-    # ── 2. Row 1: SchemaSay AI & SQL Workbench ────────────────────────────────
+    # Render Top Navbar sticky at the top of main content block
+    st.markdown(navbar_content, unsafe_allow_html=True)
+    
+    # ── 2. Render Main Grid Canvas ───────────────────────────────────────────
+    st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+    
+    # Row 1: SchemaSay AI & SQL Workbench
     row1_col1, row1_col2 = st.columns([1, 1.1])
     with row1_col1:
-        st.markdown('<div class="dashboard-card card-r1-left">', unsafe_allow_html=True)
-        render_ai_copilot_panel()
-        st.markdown('</div>', unsafe_allow_html=True)
-        
+        with st.container(border=True):
+            st.markdown('<div class="card-height-r1"></div>', unsafe_allow_html=True)
+            render_ai_copilot_panel()
+            
     with row1_col2:
-        st.markdown('<div class="dashboard-card card-r1-right">', unsafe_allow_html=True)
-        # SQL Workbench Card (Empty for Phase 5)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-    # ── 3. Row 2: Schema Explorer, Center tabs, Right feeds ───────────────────
+        with st.container(border=True):
+            st.markdown('<div class="card-height-r1"></div>', unsafe_allow_html=True)
+            # SQL Workbench (Empty for Phase 5)
+            pass
+            
+    # Row 2: Schema Explorer, Center panel, Right feeds
     row2_col1, row2_col2, row2_col3 = st.columns([1.2, 3.2, 1.3])
     with row2_col1:
-        st.markdown('<div class="dashboard-card card-r2-left">', unsafe_allow_html=True)
-        # Schema Explorer Card (Empty for Phase 5)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
+        with st.container(border=True):
+            st.markdown('<div class="card-height-r2"></div>', unsafe_allow_html=True)
+            # Schema Explorer (Empty for Phase 5)
+            pass
+            
     with row2_col2:
-        st.markdown('<div class="dashboard-card card-r2-center">', unsafe_allow_html=True)
-        # Center Panel Tabs Card (Empty for Phase 5)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
+        with st.container(border=True):
+            st.markdown('<div class="card-height-r2"></div>', unsafe_allow_html=True)
+            # Center Panel (Empty for Phase 5)
+            pass
+            
     with row2_col3:
-        st.markdown('<div class="dashboard-card card-r2-right">', unsafe_allow_html=True)
-        # Right Feeds Card (Empty for Phase 5)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
+        with st.container(border=True):
+            st.markdown('<div class="card-height-r2"></div>', unsafe_allow_html=True)
+            # Right Feeds (Empty for Phase 5)
+            pass
+            
     # ── 4. Row 3: Full Width Container ────────────────────────────────────────
-    st.markdown(
-        '<div class="col-row3-full">'
-        '<div class="dashboard-card card-r3-full"></div>'
-        '</div>',
-        unsafe_allow_html=True
-    )
-    
+    with st.container(border=True):
+        st.markdown('<div class="card-height-r3"></div>', unsafe_allow_html=True)
+        # Footer Card (Empty for Phase 5)
+        pass
+        
     # ── 5. Close Layout Containers ────────────────────────────────────────────
-    st.markdown('</div></main></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 elif response.status_code == 401 and KEY_REFRESH_TOKEN in st.session_state:
     # Access token expired — attempt silent refresh
