@@ -4,15 +4,14 @@
    active indicator tabs, hover statuses, and the Quick Tip container card.
    ========================================================================== */
 
-/* Outer scrollable list container */
+/* Outer container - disable scrollbars by default for clean dashboard layout */
 .sidebar-inner {
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    padding: var(--spacing-xl) var(--spacing-lg);
-    overflow-y: auto;
-    overflow-x: hidden;
+    padding: 14px 12px;
+    overflow: hidden;
 }
 
 /* ── 1. LOGO SECTION ────────────────────────────────────────────────────── */
@@ -20,8 +19,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--spacing-xl);
-    padding: 0 var(--spacing-xs);
+    margin-bottom: var(--spacing-lg);
+    padding: 0 4px;
     flex-shrink: 0;
 }
 
@@ -42,7 +41,7 @@
 
 .sidebar-logo-text {
     font-family: var(--font-display);
-    font-size: var(--font-size-lg);
+    font-size: 16px;
     font-weight: var(--font-weight-bold);
     color: var(--color-text-inverse);
     letter-spacing: -0.03em;
@@ -69,7 +68,7 @@
 .sidebar-menu-list {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -78,12 +77,12 @@
 .nav-item {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    padding: 10px 14px;
+    gap: 10px;
+    padding: 8px 12px;
     color: var(--color-text-muted);
     text-decoration: none;
     font-weight: var(--font-weight-medium);
-    font-size: var(--font-size-base);
+    font-size: 13px;
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: var(--transition-fast);
@@ -112,13 +111,13 @@
 .sidebar-divider {
     height: 1px;
     background-color: var(--color-border-subtle);
-    margin: var(--spacing-lg) 0;
+    margin: 8px 0;
     flex-shrink: 0;
 }
 
 /* ── 4. LOGOUT ACTION ────────────────────────────────────────────────────── */
 .logout-item {
-    color: #EF4444; /* Alert soft red matching sidebar */
+    color: #EF4444; 
 }
 
 .logout-item:hover {
@@ -130,51 +129,85 @@
 .quick-tip-card {
     background-color: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin-top: auto; /* Push card to the bottom of the container */
+    border-radius: var(--radius-md);
+    padding: 12px;
+    margin-top: auto; 
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
 }
 
+.quick-tip-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
 .quick-tip-icon {
     display: flex;
     align-items: center;
-    color: #F59E0B; /* Bright amber lightbulb color */
-    margin-bottom: var(--spacing-sm);
+    color: #F59E0B; 
 }
 
 .quick-tip-title {
     font-family: var(--font-display);
-    font-size: var(--font-size-base);
+    font-size: 13px;
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-inverse);
-    margin-bottom: var(--spacing-xs);
 }
 
 .quick-tip-desc {
-    font-size: var(--font-size-xs);
-    line-height: var(--line-height-normal);
+    font-size: 11px;
+    line-height: 1.4;
     color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+}
+
+.quick-tip-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .quick-tip-pagination {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     align-items: center;
 }
 
 .pagination-dot {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.15);
+    display: inline-block;
+    transition: var(--transition-fast);
+}
+
+.pagination-dot:hover {
+    background-color: rgba(255, 255, 255, 0.35);
 }
 
 .pagination-dot.active {
     background-color: var(--color-primary);
-    width: 14px;
+    width: 12px;
     border-radius: var(--radius-pill);
 }
+
+.tip-nav-btn {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-weight: var(--font-weight-bold);
+    transition: var(--transition-fast);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.tip-nav-btn:hover {
+    color: var(--color-text-inverse);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+

@@ -55,8 +55,16 @@ if response.status_code == 200:
     _load_css("sidebar.css")
     
     # Render layout with modular sidebar component
+    # Extract tip index query param to enable dynamic quick tip rotation
+    active_tip = 0
+    try:
+        if "tip" in st.query_params:
+            active_tip = int(st.query_params["tip"])
+    except Exception:
+        pass
+
     from components.sidebar import render_sidebar
-    sidebar_content = render_sidebar().replace("\n", "")
+    sidebar_content = render_sidebar(active_tip).replace("\n", "")
     
     layout_html = (
         '<div class="app-layout-wrapper">'
