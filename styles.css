@@ -950,3 +950,230 @@ section[data-testid="stSidebar"] {
     .header-username { display: none; }
     .header-navbar { padding: 0 var(--spacing-4); }
 }
+
+/* ==========================================================================
+   PHASE 3 — TOP WORKSPACE PANELS
+   ========================================================================== */
+
+/* Sparkle icon style */
+.sparkle-icon {
+    color: #60A5FA;
+    font-size: 16px;
+    margin-right: 4px;
+}
+
+/* Card layout spacing alignment */
+.card-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-header-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+/* AI Copilot Prompt Input container row */
+.copilot-input-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-bottom: var(--spacing-4);
+    background-color: var(--color-bg-app);
+    border: var(--border-width) var(--border-style) var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-1) var(--spacing-2) var(--spacing-1) var(--spacing-3);
+    transition: all 0.15s ease-in-out;
+}
+
+.copilot-input-container:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+    background-color: #FFFFFF;
+}
+
+.copilot-input-box {
+    flex-grow: 1;
+    border: none !important;
+    background: transparent !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--color-text-primary);
+    outline: none !important;
+    box-shadow: none !important;
+    padding: var(--spacing-2) 0 !important;
+}
+
+.copilot-generate-btn {
+    background-color: var(--color-primary) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 14px !important;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.15);
+}
+
+.copilot-generate-btn:hover {
+    background-color: var(--color-primary-hover) !important;
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);
+}
+
+.btn-paper-plane {
+    font-size: 12px;
+    transform: rotate(45deg);
+    display: inline-block;
+}
+
+/* SQL Preview & editor code block container styling */
+.sql-preview-block,
+.workbench-editor-container {
+    background-color: #FAF8F6;
+    border: var(--border-width) var(--border-style) var(--color-border);
+    border-radius: var(--radius-md);
+    display: flex;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: var(--spacing-4) 0;
+    color: #1E293B;
+    overflow-x: auto;
+    min-height: 160px;
+}
+
+.code-line-numbers {
+    color: #94A3B8;
+    text-align: right;
+    padding: 0 var(--spacing-3) 0 var(--spacing-4);
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.code-content {
+    padding-left: var(--spacing-4);
+    white-space: nowrap;
+    overflow-x: auto;
+    flex-grow: 1;
+}
+
+/* Syntax highlighted parameters styles */
+.sql-keyword {
+    color: #0284C7;
+    font-weight: 600;
+}
+
+.sql-function {
+    color: #7C3AED;
+    font-weight: 500;
+}
+
+.sql-string {
+    color: #059669;
+}
+
+.sql-number {
+    color: #D97706;
+}
+
+/* SQL Workbench layout options */
+.workbench-format-btn {
+    background-color: transparent !important;
+    border: var(--border-width) var(--border-style) var(--color-border) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--color-text-secondary) !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 12px !important;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.workbench-format-btn:hover {
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
+    background-color: var(--color-primary-light) !important;
+}
+
+/* Workbench Bottom Toolbar row styling */
+.workbench-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: var(--border-width) var(--border-style) var(--color-divider);
+    padding-top: var(--spacing-4);
+}
+
+.toolbar-btn-run {
+    background-color: var(--color-primary) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: var(--radius-md) !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: var(--spacing-2) var(--spacing-5) !important;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.toolbar-btn-run:hover {
+    background-color: var(--color-primary-hover) !important;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+.toolbar-center-group {
+    display: flex;
+    gap: var(--spacing-2);
+}
+
+.toolbar-btn-icon {
+    background-color: transparent !important;
+    border: var(--border-width) var(--border-style) var(--color-border) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--color-text-secondary) !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px !important;
+    transition: all 0.15s ease-in-out;
+}
+
+.toolbar-btn-icon:hover {
+    border-color: var(--color-border-hover) !important;
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-app) !important;
+}
+
+.toolbar-btn-save {
+    background-color: transparent !important;
+    border: var(--border-width) var(--border-style) var(--color-border) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--color-text-secondary) !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px !important;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.toolbar-btn-save:hover {
+    border-color: var(--color-border-hover) !important;
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-app) !important;
+}

@@ -76,8 +76,31 @@ with col_center:
     with col_top1:
         st.markdown(
             """
-            <div class="placeholder-card card-medium">
-                <div class="placeholder-title">AI Copilot</div>
+            <div class="workspace-card" style="min-height: 330px; margin-bottom: 0;">
+                <div class="card-header-row" style="margin-bottom: 12px;">
+                    <div class="card-header-title">
+                        <span class="sparkle-icon">✦</span> AI Copilot
+                    </div>
+                </div>
+                <div class="copilot-input-container">
+                    <input type="text" class="copilot-input-box" value="Show total sales per month for the last year" readonly />
+                    <button class="copilot-generate-btn">
+                        Generate SQL <span class="btn-paper-plane">✈</span>
+                    </button>
+                </div>
+                <div class="sql-preview-block">
+                    <div class="code-line-numbers">
+                        <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+                    </div>
+                    <div class="code-content">
+                        <div><span class="sql-keyword">SELECT</span> <span class="sql-function">DATE_TRUNC</span>(<span class="sql-string">'month'</span>, order_date) <span class="sql-keyword">AS</span> month,</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-function">SUM</span>(total_amount) <span class="sql-keyword">AS</span> total_sales</div>
+                        <div><span class="sql-keyword">FROM</span> orders</div>
+                        <div><span class="sql-keyword">WHERE</span> order_date &gt;= <span class="sql-function">DATE_TRUNC</span>(<span class="sql-string">'year'</span>, <span class="sql-keyword">CURRENT_DATE</span>) - <span class="sql-keyword">INTERVAL</span> <span class="sql-string">'1 year'</span></div>
+                        <div><span class="sql-keyword">GROUP BY</span> <span class="sql-number">1</span>,</div>
+                        <div><span class="sql-keyword">ORDER BY</span> <span class="sql-number">1</span>;</div>
+                    </div>
+                </div>
             </div>
             """,
             unsafe_allow_html=True
@@ -85,8 +108,34 @@ with col_center:
     with col_top2:
         st.markdown(
             """
-            <div class="placeholder-card card-medium">
-                <div class="placeholder-title">SQL Workbench</div>
+            <div class="workspace-card" style="min-height: 330px; margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div class="card-header-row" style="margin-bottom: 12px;">
+                        <div class="card-header-title">SQL Workbench</div>
+                        <button class="workbench-format-btn">{} Format SQL</button>
+                    </div>
+                    <div class="workbench-editor-container">
+                        <div class="code-line-numbers">
+                            <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+                        </div>
+                        <div class="code-content">
+                            <div><span class="sql-keyword">SELECT</span> <span class="sql-function">DATE_TRUNC</span>(<span class="sql-string">'month'</span>, order_date) <span class="sql-keyword">AS</span> month,</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-function">SUM</span>(total_amount) <span class="sql-keyword">AS</span> total_sales</div>
+                            <div><span class="sql-keyword">FROM</span> orders</div>
+                            <div><span class="sql-keyword">WHERE</span> order_date &gt;= <span class="sql-function">DATE_TRUNC</span>(<span class="sql-string">'year'</span>, <span class="sql-keyword">CURRENT_DATE</span>)</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="sql-keyword">INTERVAL</span> <span class="sql-string">'1 year'</span></div>
+                            <div><span class="sql-keyword">GROUP BY</span> <span class="sql-number">1</span>; <span class="sql-keyword">ORDER BY</span> <span class="sql-number">1</span>;</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="workbench-toolbar" style="margin-top: 12px;">
+                    <button class="toolbar-btn-run">▶ Run Query</button>
+                    <div class="toolbar-center-group">
+                        <button class="toolbar-btn-icon">↕</button>
+                        <button class="toolbar-btn-icon">↻</button>
+                    </div>
+                    <button class="toolbar-btn-save">💾 Save Query</button>
+                </div>
             </div>
             """,
             unsafe_allow_html=True
