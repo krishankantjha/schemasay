@@ -65,6 +65,7 @@ if response.status_code == 200:
     # Load layout stylesheets
     _load_css("sidebar.css")
     _load_css("navbar.css")
+    _load_css("dashboard_layout.css")
     
     # Extract tip index query param to enable dynamic quick tip rotation
     active_tip = 0
@@ -76,14 +77,16 @@ if response.status_code == 200:
 
     from components.sidebar import render_sidebar
     from components.navbar import render_navbar
+    from components.dashboard_layout import render_dashboard_layout
     
     sidebar_content = render_sidebar(active_tip).replace("\n", "")
     navbar_content = render_navbar(title="Dashboard", display_name=display_name, initials=initials).replace("\n", "")
+    dashboard_content = render_dashboard_layout().replace("\n", "")
     
     layout_html = (
         '<div class="app-layout-wrapper">'
         f'<aside class="sidebar-container-shell">{sidebar_content}</aside>'
-        f'<main class="main-content-container-shell">{navbar_content}<div class="main-page-canvas"><!-- Empty Canvas Area --></div></main>'
+        f'<main class="main-content-container-shell">{navbar_content}{dashboard_content}</main>'
         '</div>'
     )
     st.markdown(layout_html, unsafe_allow_html=True)
