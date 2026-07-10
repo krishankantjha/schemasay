@@ -31,14 +31,12 @@ else:
         response = api_client.get_me(token)
     
     if response.status_code == 200:
-        # Render the sidebar component (returns the navigation selection)
-        page = render_sidebar_view()
-        
-        # Render corresponding page based on active page selection
-        if page == "Database Connections":
-            show_connection_manager()
-        else:
-            show_query_assistant_panel()
+        # Load the unified dashboard layout mockup from root main.py
+        import sys
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        if root_dir not in sys.path:
+            sys.path.insert(0, root_dir)
+        import main
             
     elif response.status_code == 401 and KEY_REFRESH_TOKEN in st.session_state:
         # Access token expired — try to renew it using the refresh token

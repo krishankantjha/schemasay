@@ -2,10 +2,13 @@ import streamlit as st
 import os
 
 # 1. Set Streamlit Page Configurations
-st.set_page_config(
-    page_title="SchemaSay Workspace",
-    layout="wide"
-)
+try:
+    st.set_page_config(
+        page_title="SchemaSay Workspace",
+        layout="wide"
+    )
+except Exception:
+    pass
 
 # 2. Inject Reusable Design System and Application Shell CSS
 css_path = os.path.join(os.path.dirname(__file__), "styles.css")
