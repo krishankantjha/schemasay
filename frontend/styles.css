@@ -1923,3 +1923,137 @@ section[data-testid="stSidebar"] {
 
 .outcome-icon.success-icon { background-color: var(--color-success-bg); color: var(--color-success); }
 .outcome-icon.error-icon { background-color: var(--color-danger-bg); color: var(--color-danger); }
+
+/* ==========================================================================
+   PHASE 7 — SETTINGS & PROFILE STYLES
+   ========================================================================== */
+
+.settings-profile-avatar {
+    width: 64px;
+    height: 64px;
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    border-radius: var(--radius-circle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-divider);
+    padding-bottom: var(--spacing-4);
+}
+.settings-toggle-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Custom switch toggle inputs styling */
+.toggle-switch-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 22px;
+}
+
+.toggle-switch-wrapper input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #E2E8F0;
+    transition: .3s;
+    border-radius: 34px;
+}
+
+.toggle-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+    box-shadow: var(--shadow-xs);
+}
+
+.toggle-switch-wrapper input:checked + .toggle-switch-slider {
+    background-color: var(--color-primary);
+}
+
+.toggle-switch-wrapper input:focus + .toggle-switch-slider {
+    box-shadow: 0 0 1px var(--color-primary);
+}
+
+.toggle-switch-wrapper input:checked + .toggle-switch-slider:before {
+    transform: translateX(22px);
+}
+
+.toggle-switch-wrapper input:disabled + .toggle-switch-slider {
+    background-color: #CBD5E1;
+    cursor: not-allowed;
+}
+
+/* Settings Forms elements styling overrides */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.form-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100% !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 12px !important;
+    padding: var(--spacing-2) var(--spacing-3) !important;
+    background-color: var(--color-bg-app) !important;
+    border: var(--border-width) var(--border-style) var(--color-border) !important;
+    border-radius: var(--radius-md) !important;
+    outline: none !important;
+    color: var(--color-text-primary) !important;
+    transition: all 0.15s ease-in-out;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    border-color: var(--color-primary) !important;
+    background-color: #FFFFFF !important;
+    box-shadow: 0 0 0 3px var(--color-focus-ring) !important;
+}
+
+.form-textarea {
+    resize: vertical;
+}
+
+/* Card standard definitions */
+.card-standard {
+    background-color: var(--color-surface);
+    border: var(--border-width) var(--border-style) var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-xs);
+}

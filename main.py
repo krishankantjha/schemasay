@@ -36,7 +36,7 @@ st.markdown(
 # 4. Left Sidebar Navigation Panel Structure
 active_view = st.sidebar.selectbox(
     "Navigation Screen",
-    ["Dashboard", "Database Connections", "Spreadsheet Upload"],
+    ["Dashboard", "Database Connections", "Spreadsheet Upload", "Settings & Profile"],
     index=0
 )
 
@@ -51,6 +51,417 @@ st.sidebar.markdown(
     """,
     unsafe_allow_html=True
 )
+
+if active_view == "Settings & Profile":
+    st.markdown(
+        """
+        <div class="settings-page-header" style="padding: 0 var(--spacing-6); margin-bottom: 24px;">
+            <h1 class="font-h1" style="color: var(--color-text-primary); margin: 0;">Settings</h1>
+            <p class="text-subtitle" style="margin: 4px 0 0 0;">Manage your personal profile, account settings, and application preferences.</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    col_settings_nav, col_settings_content = st.columns([1, 2.8], gap="medium")
+    with col_settings_nav:
+        settings_section = st.radio(
+            "Settings Sub-Navigation",
+            ["Profile", "Account", "Security", "Appearance", "Notifications", "API Keys", "Help & About"],
+            label_visibility="collapsed"
+        )
+    with col_settings_content:
+        if settings_section == "Profile":
+            st.markdown(
+                """
+                <div class="workspace-card fade-in" style="padding: var(--spacing-5);">
+                    <h3 class="font-h3" style="margin-top: 0; margin-bottom: 20px;">Profile Settings</h3>
+                    <div style="display: flex; align-items: center; gap: var(--spacing-5); margin-bottom: var(--spacing-6);">
+                        <div class="settings-profile-avatar">JD</div>
+                        <div>
+                            <button class="btn-base btn-primary btn-sm">Change Photo</button>
+                            <p class="text-caption" style="margin: 6px 0 0 0;">JPG, GIF or PNG. Max size of 800K</p>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-4); margin-bottom: var(--spacing-5);">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" value="John Doe" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" value="john.doe@schemasay.com" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" class="form-input" value="+1 (555) 019-2834" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-input" value="SchemaSay Inc." />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Job Title</label>
+                            <input type="text" class="form-input" value="Senior Data Analyst" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-input" value="San Francisco, CA" />
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: var(--spacing-6);">
+                        <label class="form-label">Personal Bio</label>
+                        <textarea class="form-textarea" rows="4">Senior Data Analyst specializing in database operations, sales trends analytics, and SQL query formatting optimizations.</textarea>
+                    </div>
+                    <div style="display: flex; gap: var(--spacing-3); justify-content: flex-end;">
+                        <button class="btn-base btn-outline">Cancel</button>
+                        <button class="btn-base btn-primary">Save Changes</button>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        
+        elif settings_section == "Account":
+            st.markdown(
+                """
+                <div class="workspace-card fade-in" style="padding: var(--spacing-5);">
+                    <h3 class="font-h3" style="margin-top: 0; margin-bottom: 20px;">Account Settings</h3>
+                    <div class="form-group" style="margin-bottom: var(--spacing-4);">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-input" value="johndoe_analyst" />
+                    </div>
+                    <div class="form-group" style="margin-bottom: var(--spacing-4);">
+                        <label class="form-label">Secondary Email</label>
+                        <input type="email" class="form-input" value="john.backup@gmail.com" />
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-4); margin-bottom: var(--spacing-6);">
+                        <div class="form-group">
+                            <label class="form-label">Language</label>
+                            <select class="form-select">
+                                <option>English (US)</option>
+                                <option>Spanish</option>
+                                <option>French</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Timezone</label>
+                            <select class="form-select">
+                                <option>UTC -08:00 (PST)</option>
+                                <option>UTC +00:00 (GMT)</option>
+                                <option>UTC +05:30 (IST)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date Format</label>
+                            <select class="form-select">
+                                <option>YYYY-MM-DD</option>
+                                <option>MM/DD/YYYY</option>
+                                <option>DD-MM-YYYY</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: var(--spacing-3); justify-content: flex-end;">
+                        <button class="btn-base btn-outline">Reset</button>
+                        <button class="btn-base btn-primary">Save Settings</button>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        elif settings_section == "Security":
+            st.markdown(
+                """
+                <div class="workspace-card fade-in" style="padding: var(--spacing-5);">
+                    <h3 class="font-h3" style="margin-top: 0; margin-bottom: 20px;">Security Credentials</h3>
+                    
+                    <!-- Change Password -->
+                    <div style="border-bottom: 1px solid var(--color-divider); padding-bottom: var(--spacing-5); margin-bottom: var(--spacing-5);">
+                        <div class="form-group" style="margin-bottom: var(--spacing-4);">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" class="form-input" placeholder="••••••••" />
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-4); margin-bottom: var(--spacing-4);">
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-input" placeholder="••••••••" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-input" placeholder="••••••••" />
+                            </div>
+                        </div>
+                        <div style="margin-bottom: var(--spacing-4);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                <span class="text-caption">Password Strength</span>
+                                <span class="text-caption" style="color: var(--color-success); font-weight: 600;">Strong</span>
+                            </div>
+                            <div style="height: 4px; background-color: var(--color-divider); border-radius: var(--radius-pill); overflow: hidden;">
+                                <div style="width: 85%; height: 100%; background-color: var(--color-success);"></div>
+                            </div>
+                        </div>
+                        <button class="btn-base btn-primary btn-sm">Update Password</button>
+                    </div>
+
+                    <!-- Two-Factor Authentication -->
+                    <div style="border-bottom: 1px solid var(--color-divider); padding-bottom: var(--spacing-5); margin-bottom: var(--spacing-5); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 class="font-h4" style="margin: 0 0 4px 0;">Two-Factor Authentication (2FA)</h4>
+                            <p class="text-caption" style="margin: 0;">Add an extra layer of protection to your analyst account credentials.</p>
+                        </div>
+                        <label class="toggle-switch-wrapper">
+                            <input type="checkbox" checked />
+                            <span class="toggle-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Active Sessions -->
+                    <div>
+                        <h4 class="font-h4" style="margin: 0 0 12px 0;">Logged Devices & Active Sessions</h4>
+                        <div style="display: flex; flex-direction: column; gap: var(--spacing-3); margin-bottom: var(--spacing-5);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-3); background-color: var(--color-bg-app); border: var(--border-width) var(--border-style) var(--color-border); border-radius: var(--radius-md);">
+                                <div>
+                                    <div class="text-body" style="font-weight: 600;">Chrome on Windows 11 (Current Session)</div>
+                                    <div class="text-caption">San Francisco, CA &nbsp;•&nbsp; IP: 192.168.1.42</div>
+                                </div>
+                                <span class="badge-base badge-success">Active</span>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-3); background-color: var(--color-bg-app); border: var(--border-width) var(--border-style) var(--color-border); border-radius: var(--radius-md);">
+                                <div>
+                                    <div class="text-body" style="font-weight: 600;">Safari on Apple iPhone 15</div>
+                                    <div class="text-caption">San Francisco, CA &nbsp;•&nbsp; IP: 172.56.21.9</div>
+                                </div>
+                                <button class="btn-base btn-outline btn-sm">Revoke</button>
+                            </div>
+                        </div>
+                        <button class="btn-base btn-danger btn-sm">Logout All Devices</button>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        elif settings_section == "Appearance":
+            st.markdown(
+                """
+                <div class="workspace-card fade-in" style="padding: var(--spacing-5);">
+                    <h3 class="font-h3" style="margin-top: 0; margin-bottom: 20px;">Interface Appearance</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-5); margin-bottom: var(--spacing-6);">
+                        <div class="form-group">
+                            <label class="form-label">Application Theme</label>
+                            <select class="form-select">
+                                <option>Light Slate Theme (Mockup Default)</option>
+                                <option>Enterprise Dark Theme</option>
+                                <option>System Default Settings</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Layout Line Density</label>
+                            <select class="form-select">
+                                <option>Standard spacing (mockup geometric)</option>
+                                <option>Data-Dense (compact views)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sidebar Navigation Alignment</label>
+                            <select class="form-select">
+                                <option>Left-hand fixed panel</option>
+                                <option>Collapsible overlay navigation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">System Font Size</label>
+                            <select class="form-select">
+                                <option>13px (Default standard)</option>
+                                <option>12px (Small readability)</option>
+                                <option>14px (Large scale)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Layout density preview block -->
+                    <div>
+                        <h4 class="font-h4" style="margin: 0 0 12px 0;">Visual Layout Preview</h4>
+                        <div style="border: var(--border-width) var(--border-style) var(--color-border); border-radius: var(--radius-md); padding: var(--spacing-4); background-color: var(--color-bg-app); display: flex; align-items: center; gap: var(--spacing-4);">
+                            <div style="width: 40px; height: 40px; background-color: var(--color-primary-light); color: var(--color-primary); border-radius: var(--radius-circle); display: flex; align-items: center; justify-content: center; font-weight: 700;">Aa</div>
+                            <div>
+                                <div class="text-body" style="font-weight: 600;">Geometric Layout Scale Preview</div>
+                                <p class="text-caption" style="margin: 4px 0 0 0;">This preview demonstrates the selected theme values, density gaps, and Outfit fonts scaling.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        elif settings_section == "Notifications":
+            st.markdown(
+                """
+                <div class="workspace-card fade-in" style="padding: var(--spacing-5);">
+                    <h3 class="font-h3" style="margin-top: 0; margin-bottom: 20px;">Notification Preferences</h3>
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-5);">
+                        <div class="settings-toggle-row">
+                            <div>
+                                <h4 class="font-h4" style="margin: 0 0 4px 0;">Email Notifications</h4>
+                                <p class="text-caption" style="margin: 0;">Receive daily transaction logs, backup registers, and query logs.</p>
+                            </div>
+                            <label class="toggle-switch-wrapper">
+                                <input type="checkbox" checked />
+                                <span class="toggle-switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="settings-toggle-row">
+                            <div>
+                                <h4 class="font-h4" style="margin: 0 0 4px 0;">Push Notifications</h4>
+                                <p class="text-caption" style="margin: 0;">Receive real-time notifications on browser query outcomes.</p>
+                            </div>
+                            <label class="toggle-switch-wrapper">
+                                <input type="checkbox" />
+                                <span class="toggle-switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="settings-toggle-row">
+                            <div>
+                                <h4 class="font-h4" style="margin: 0 0 4px 0;">AI Business Insights Alerts</h4>
+                                <p class="text-caption" style="margin: 0;">Alert when the background pipeline extracts fresh business trends.</p>
+                            </div>
+                            <label class="toggle-switch-wrapper">
+                                <input type="checkbox" checked />
+                                <span class="toggle-switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="settings-toggle-row">
+                            <div>
+                                <h4 class="font-h4" style="margin: 0 0 4px 0;">Schema Updates Notification</h4>
+                                <p class="text-caption" style="margin: 0;">Alert when database schemas sync columns, primary keys, or tables.</p>
+                            </div>
+                            <label class="toggle-switch-wrapper">
+                                <input type="checkbox" checked />
+                                <span class="toggle-switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="settings-toggle-row">
+                            <div>
+                                <h4 class="font-h4" style="margin: 0 0 4px 0;">Security Alerts</h4>
+                                <p class="text-caption" style="margin: 0;">Crucial email warnings when fresh devices login or tokens regenerate.</p>
+                            </div>
+                            <label class="toggle-switch-wrapper">
+                                <input type="checkbox" checked disabled />
+                                <span class="toggle-switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        elif settings_section == "API Keys":
+            st.markdown(
+                """
+                <div class="workspace-card fade-in" style="padding: var(--spacing-5);">
+                    <div class="card-header-row" style="margin-bottom: 20px;">
+                        <h3 class="font-h3" style="margin: 0;">API Access Tokens</h3>
+                        <button class="btn-base btn-primary btn-sm">+ Create Token Key</button>
+                    </div>
+                    
+                    <p class="text-caption" style="margin-bottom: var(--spacing-5);">Expose backend ingestion and query formatting routes to CLI and scripts via secure token headers.</p>
+                    
+                    <div class="table-container" style="margin-bottom: var(--spacing-5);">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Token Name</th>
+                                    <th>Token Value</th>
+                                    <th>Created Date</th>
+                                    <th>Last Used</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: 600;">cli_data_ingest_key</td>
+                                    <td><code class="text-code" style="background-color: var(--color-bg-app); padding: 2px 6px; border-radius: 4px;">sch_live_••••a83b</code></td>
+                                    <td>2026-07-08</td>
+                                    <td>10 mins ago</td>
+                                    <td><span class="badge-base badge-success">Active</span></td>
+                                    <td>
+                                        <span class="connection-action-btn" style="margin-right: 8px;">Copy</span>
+                                        <span class="connection-action-btn btn-danger-action">Revoke</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">notebook_sales_verify_token</td>
+                                    <td><code class="text-code" style="background-color: var(--color-bg-app); padding: 2px 6px; border-radius: 4px;">sch_live_••••f91e</code></td>
+                                    <td>2026-07-09</td>
+                                    <td>Yesterday</td>
+                                    <td><span class="badge-base badge-success">Active</span></td>
+                                    <td>
+                                        <span class="connection-action-btn" style="margin-right: 8px;">Copy</span>
+                                        <span class="connection-action-btn btn-danger-action">Revoke</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Empty state panel illustration placeholder -->
+                    <div class="test-state-box" style="justify-content: center; text-align: center; padding: var(--spacing-5);">
+                        <div>
+                            <span style="font-size: 24px;">🔑</span>
+                            <h4 class="font-h4" style="margin: 8px 0 4px 0;">No Active API Tokens</h4>
+                            <p class="text-caption" style="margin: 0;">Create a token key block to automate ingestion steps.</p>
+                        </div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        elif settings_section == "Help & About":
+            st.markdown(
+                """
+                <div class="workspace-card fade-in" style="padding: var(--spacing-5);">
+                    <h3 class="font-h3" style="margin-top: 0; margin-bottom: 20px;">Help & Support Resources</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-5); margin-bottom: var(--spacing-6);">
+                        <div class="card-standard" style="padding: var(--spacing-4);">
+                            <h4 class="font-h4" style="margin-top: 0; margin-bottom: 6px;">📖 Product Documentation</h4>
+                            <p class="text-caption" style="margin-bottom: 12px;">Explore user manuals, database setup guides, and SQL formatting standards.</p>
+                            <button class="btn-base btn-secondary btn-sm" style="width: 100%;">View Docs</button>
+                        </div>
+                        <div class="card-standard" style="padding: var(--spacing-4);">
+                            <h4 class="font-h4" style="margin-top: 0; margin-bottom: 6px;">👥 Developer Community</h4>
+                            <p class="text-caption" style="margin-bottom: 12px;">Join the Slack organization to discuss database integration recipes and analyst workflows.</p>
+                            <button class="btn-base btn-secondary btn-sm" style="width: 100%;">Join Channel</button>
+                        </div>
+                        <div class="card-standard" style="padding: var(--spacing-4);">
+                            <h4 class="font-h4" style="margin-top: 0; margin-bottom: 6px;">✉ Contact Enterprise Support</h4>
+                            <p class="text-caption" style="margin-bottom: 12px;">Talk with database specialists and account support teams for custom SLA inquiries.</p>
+                            <button class="btn-base btn-secondary btn-sm" style="width: 100%;">Email Support</button>
+                        </div>
+                        <div class="card-standard" style="padding: var(--spacing-4);">
+                            <h4 class="font-h4" style="margin-top: 0; margin-bottom: 6px;">❓ System FAQ</h4>
+                            <p class="text-caption" style="margin-bottom: 12px;">Find quick answers regarding cold start delays, spreadsheet limits, and security protocols.</p>
+                            <button class="btn-base btn-secondary btn-sm" style="width: 100%;">Open FAQ</button>
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--color-divider); padding-top: var(--spacing-4); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div class="text-body" style="font-weight: 600;">SchemaSay Workspace Client</div>
+                            <div class="text-caption" style="margin-top: 2px;">Version: <strong>1.4.2-staging</strong> &nbsp;•&nbsp; License: <strong>Enterprise Standard SaaS</strong></div>
+                        </div>
+                        <span class="badge-base badge-secondary">All Services Operational</span>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+    st.stop()
 
 if active_view == "Database Connections":
     st.markdown(
