@@ -56,21 +56,15 @@ if response.status_code == 200:
     
     # Render layout with modular sidebar component
     from components.sidebar import render_sidebar
-    sidebar_content = render_sidebar()
+    sidebar_content = render_sidebar().replace("\n", "")
     
-    st.markdown(
-        f"""
-        <div class="app-layout-wrapper">
-            <aside class="sidebar-container-shell">
-                {sidebar_content}
-            </aside>
-            <main class="main-content-container-shell">
-                <!-- Main Content Container: Empty for now -->
-            </main>
-        </div>
-        """,
-        unsafe_allow_html=True
+    layout_html = (
+        '<div class="app-layout-wrapper">'
+        f'<aside class="sidebar-container-shell">{sidebar_content}</aside>'
+        '<main class="main-content-container-shell"><!-- Main Content Container: Empty for now --></main>'
+        '</div>'
     )
+    st.markdown(layout_html, unsafe_allow_html=True)
     st.stop()
 
 elif response.status_code == 401 and KEY_REFRESH_TOKEN in st.session_state:
