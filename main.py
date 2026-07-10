@@ -298,15 +298,183 @@ with col_center:
         unsafe_allow_html=True
     )
 
-# Column 3: Right Stacked Panels (Query History & Insights)
+# Column 3: Right Stacked Panels (Query History, Insights, KPIs, Activity)
 with col_right:
+    # 1. Query History Card
     st.markdown(
         """
-        <div class="placeholder-card card-medium-alt">
-            <div class="placeholder-title">Query History</div>
+        <div class="workspace-card card-medium-alt" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 20px;">
+            <div>
+                <div class="card-header-row" style="margin-bottom: 12px;">
+                    <div class="card-header-title">Query History</div>
+                </div>
+                <div class="history-search-row" style="margin-bottom: 12px;">
+                    <input type="text" class="history-search-input" placeholder="🔍 Search queries..." />
+                </div>
+                <div class="history-feed-scroll">
+                    <!-- Item 1 -->
+                    <div class="history-item-row">
+                        <div class="history-item-badge badge-warning-bullet"></div>
+                        <div class="history-item-content">
+                            <div class="history-item-title">Show total sales per month for...</div>
+                            <div class="history-item-meta">Just now &nbsp;•&nbsp; <span class="badge-postgres-sm">PG</span></div>
+                        </div>
+                        <div class="history-item-actions">
+                            <span class="history-action-icon">⎋</span>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="history-item-row">
+                        <div class="history-item-badge badge-danger-bullet"></div>
+                        <div class="history-item-content">
+                            <div class="history-item-title">Top 10 customers by total sales</div>
+                            <div class="history-item-meta">Yesterday &nbsp;•&nbsp; <span class="badge-postgres-sm">PG</span></div>
+                        </div>
+                        <div class="history-item-actions">
+                            <span class="history-action-icon">⎋</span>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="history-item-row">
+                        <div class="history-item-badge badge-success-bullet"></div>
+                        <div class="history-item-content">
+                            <div class="history-item-title">Products with low stock</div>
+                            <div class="history-item-meta">Yesterday &nbsp;•&nbsp; <span class="badge-mysql-sm">MY</span></div>
+                        </div>
+                        <div class="history-item-actions">
+                            <span class="history-action-icon">⎋</span>
+                        </div>
+                    </div>
+                    <!-- Item 4 -->
+                    <div class="history-item-row">
+                        <div class="history-item-badge badge-info-bullet"></div>
+                        <div class="history-item-content">
+                            <div class="history-item-title">Monthly profit trends</div>
+                            <div class="history-item-meta">2 days ago &nbsp;•&nbsp; <span class="badge-sqlite-sm">SL</span></div>
+                        </div>
+                        <div class="history-item-actions">
+                            <span class="history-action-icon">⎋</span>
+                        </div>
+                    </div>
+                    <!-- Item 5 -->
+                    <div class="history-item-row">
+                        <div class="history-item-badge badge-primary-bullet"></div>
+                        <div class="history-item-content">
+                            <div class="history-item-title">Total orders by status</div>
+                            <div class="history-item-meta">3 days ago &nbsp;•&nbsp; <span class="badge-postgres-sm">PG</span></div>
+                        </div>
+                        <div class="history-item-actions">
+                            <span class="history-action-icon">⎋</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="history-view-all-btn">View All History</button>
         </div>
-        <div class="placeholder-card card-small-alt">
-            <div class="placeholder-title">Business Insights</div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    # 2. AI Business Insights Card
+    st.markdown(
+        """
+        <div class="workspace-card card-small-alt" style="display: flex; flex-direction: column; margin-bottom: 20px;">
+            <div class="card-header-row" style="margin-bottom: 12px;">
+                <div class="card-header-title">
+                    <span class="sparkle-icon">✦</span> AI Business Insights
+                </div>
+            </div>
+            <div class="insights-scroll-content" style="flex-grow: 1; overflow-y: auto;">
+                <div class="insight-bullet-item">
+                    <span class="insight-bullet-sparkle">✦</span>
+                    <div class="insight-bullet-text">Sales show a steady upward trend with a 45% increase from Jan to May.</div>
+                </div>
+                <div class="insight-bullet-item">
+                    <span class="insight-bullet-sparkle">✦</span>
+                    <div class="insight-bullet-text">May has the highest sales of $142,770.90.</div>
+                </div>
+                <div class="insight-bullet-item">
+                    <span class="insight-bullet-sparkle">✦</span>
+                    <div class="insight-bullet-text">Average order value is consistent between $67 - $79.</div>
+                </div>
+                <div class="insight-bullet-item">
+                    <span class="insight-bullet-sparkle">✦</span>
+                    <div class="insight-bullet-text">New customer acquisition is growing month over month.</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # 3. KPI Summary Section (Added for Phase 5)
+    st.markdown(
+        """
+        <div class="workspace-card" style="margin-bottom: 20px; padding: var(--spacing-4);">
+            <div class="card-header-row" style="margin-bottom: 12px;">
+                <div class="card-header-title">KPI Summary</div>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-summary-box">
+                    <div class="kpi-label">Total Records</div>
+                    <div class="kpi-value">12,483</div>
+                    <div class="kpi-trend trend-up">▲ 12%</div>
+                </div>
+                <div class="kpi-summary-box">
+                    <div class="kpi-label">Execution Time</div>
+                    <div class="kpi-value">48 ms</div>
+                    <div class="kpi-trend trend-down">▼ 8%</div>
+                </div>
+                <div class="kpi-summary-box">
+                    <div class="kpi-label">Rows Returned</div>
+                    <div class="kpi-value">5,102</div>
+                    <div class="kpi-trend trend-neutral">■ 0%</div>
+                </div>
+                <div class="kpi-summary-box">
+                    <div class="kpi-label">Success Rate</div>
+                    <div class="kpi-value">99.4%</div>
+                    <div class="kpi-trend trend-up">▲ 0.2%</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # 4. Recent Activity Timeline (Added for Phase 5)
+    st.markdown(
+        """
+        <div class="workspace-card" style="padding: var(--spacing-4);">
+            <div class="card-header-row" style="margin-bottom: 12px;">
+                <div class="card-header-title">Recent Activity</div>
+            </div>
+            <div class="activity-timeline-wrapper">
+                <div class="timeline-track-line"></div>
+                <!-- Step 1 -->
+                <div class="timeline-event-item">
+                    <div class="timeline-bullet bullet-success"></div>
+                    <div class="timeline-event-details">
+                        <div class="timeline-event-title">PostgreSQL Database Connected</div>
+                        <div class="timeline-event-time">5 mins ago</div>
+                    </div>
+                </div>
+                <!-- Step 2 -->
+                <div class="timeline-event-item">
+                    <div class="timeline-bullet bullet-info"></div>
+                    <div class="timeline-event-details">
+                        <div class="timeline-event-title">Schema Cache Parsed (12 tables)</div>
+                        <div class="timeline-event-time">10 mins ago</div>
+                    </div>
+                </div>
+                <!-- Step 3 -->
+                <div class="timeline-event-item">
+                    <div class="timeline-bullet bullet-primary"></div>
+                    <div class="timeline-event-details">
+                        <div class="timeline-event-title">Sales trend SQL query run</div>
+                        <div class="timeline-event-time">1 hour ago</div>
+                    </div>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True
