@@ -32,8 +32,7 @@ def _load_css(filename: str) -> None:
         with open(path) as f:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-_load_css("variables.css")
-_load_css("base.css")
+_load_css("globals.css")
 
 # ── Session State Initialization ──────────────────────────────────────────────
 init_session_state()
@@ -52,11 +51,19 @@ with st.spinner("Verifying session..."):
     response = api_client.get_me(token)
 
 if response.status_code == 200:
-    # ── Authenticated: render dashboard
-    # Dashboard pages will be imported here during Phase 10 rebuild.
-    st.info(
-        "✅ Authenticated successfully. Dashboard is being rebuilt — coming in the next phase.",
-        icon="🔷",
+    # Render foundational page layout containers (Sidebar + Main Content)
+    st.markdown(
+        """
+        <div class="app-layout-wrapper">
+            <aside class="sidebar-container-shell">
+                <!-- Sidebar Container: Empty for Phase 1 -->
+            </aside>
+            <main class="main-content-container-shell">
+                <!-- Main Content Container: Empty for Phase 1 -->
+            </main>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
     st.stop()
 
