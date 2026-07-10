@@ -334,7 +334,6 @@ def show_auth_page():
             with col_form:
                 with st.container(key="form_panel_container"):
                     if st.session_state["auth_mode"] == "login":
-                        # Title of action
                         st.markdown(
                             """
                             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; margin-top: 10px;">
@@ -355,7 +354,11 @@ def show_auth_page():
                         email = st.text_input("Email Address", key="login_email", placeholder="Enter your email address")
                         password = st.text_input("Password", type="password", key="login_password", placeholder="Enter your password")
                         
-                        st.markdown("<p style='text-align: right; margin-top: -0.5rem;'><a href='#' style='font-size: 12px; font-weight: 600; color: #4169E1; text-decoration: none;'>Forgot your password?</a></p>", unsafe_allow_html=True)
+                        col_forgot, _ = st.columns([1.2, 1])
+                        with col_forgot:
+                            if st.button("Forgot your password?", key="nav_to_forgot_pwd"):
+                                st.session_state["auth_mode"] = "forgot_password"
+                                st.rerun()
                         
                         st.write("")
                         if st.button("Login", key="login_btn", type="primary", use_container_width=True):
@@ -381,6 +384,25 @@ def show_auth_page():
                                         detail = f"Server Error ({response.status_code}): {response.text[:200]}"
                                     st.error(detail)
                         
+                        st.markdown(
+                            """
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin: 20px 0;">
+                                <div style="height: 1px; background-color: #E2E8F0; flex-grow: 1;"></div>
+                                <span style="font-size: 11px; color: #94A3B8; text-transform: uppercase; font-weight: 600;">Or continue with</span>
+                                <div style="height: 1px; background-color: #E2E8F0; flex-grow: 1;"></div>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                        
+                        col_sso1, col_sso2, col_sso3 = st.columns(3)
+                        with col_sso1:
+                            st.button("Google", key="sso_google", use_container_width=True)
+                        with col_sso2:
+                            st.button("GitHub", key="sso_github", use_container_width=True)
+                        with col_sso3:
+                            st.button("Microsoft", key="sso_microsoft", use_container_width=True)
+
                         st.write("")
                         with st.container(key="signup_row_container"):
                             col_lbl, col_btn = st.columns([1.8, 1])
@@ -391,8 +413,7 @@ def show_auth_page():
                                     st.session_state["auth_mode"] = "signup"
                                     st.rerun()
 
-                    else:
-                        # Sign Up view
+                    elif st.session_state["auth_mode"] == "signup":
                         st.markdown(
                             """
                             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; margin-top: 10px;">
@@ -440,8 +461,7 @@ def show_auth_page():
                                     response = api_client.register(reg_email, reg_password, reg_name)
                                     
                                 if response.status_code == 201:
-                                    st.success("Account created successfully. You can now log in.")
-                                    st.session_state["auth_mode"] = "login"
+                                    st.session_state["auth_mode"] = "otp_verification"
                                     st.rerun()
                                 else:
                                     try:
@@ -459,3 +479,137 @@ def show_auth_page():
                                 if st.button("Log in", key="toggle_to_login", type="secondary"):
                                     st.session_state["auth_mode"] = "login"
                                     st.rerun()
+
+                    elif st.session_state["auth_mode"] == "forgot_password":
+                        st.markdown(
+                            """
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; margin-top: 10px;">
+                                <div style="width: 46px; height: 46px; background-color: #EFF6FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" style="fill: #4169E1;">
+                                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #111827; font-family: 'Inter', sans-serif;">Forgot password?</h3>
+                                    <p style="margin: 0; font-size: 13px; color: #6B7280;">Enter your email to receive recovery instructions</p>
+                                </div>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                        
+                        forgot_email = st.text_input("Email Address", key="forgot_email", placeholder="Enter your registered email address")
+                        
+                        if st.button("Send Reset Link", key="forgot_btn", type="primary", use_container_width=True):
+                            if not forgot_email:
+                                st.error("Please enter your email address")
+                            else:
+                                st.success("If that email address exists, we have sent instructions to reset your password.")
+                                st.session_state["auth_mode"] = "email_verification"
+                                st.rerun()
+                                
+                        st.write("")
+                        if st.button("Back to Log in", key="back_to_login_forgot", use_container_width=True):
+                            st.session_state["auth_mode"] = "login"
+                            st.rerun()
+
+                    elif st.session_state["auth_mode"] == "reset_password":
+                        st.markdown(
+                            """
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; margin-top: 10px;">
+                                <div style="width: 46px; height: 46px; background-color: #EFF6FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" style="fill: #4169E1;">
+                                        <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6-5c1.66 0 3 1.34 3 3v2H9V6c0-1.66 1.34-3 3-3z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #111827; font-family: 'Inter', sans-serif;">Reset Password</h3>
+                                    <p style="margin: 0; font-size: 13px; color: #6B7280;">Set a strong password for your workspace account</p>
+                                </div>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                        
+                        new_pwd = st.text_input("New Password", type="password", key="reset_new_pwd", placeholder="Enter new password")
+                        confirm_pwd = st.text_input("Confirm New Password", type="password", key="reset_confirm_pwd", placeholder="Confirm new password")
+                        
+                        if st.button("Update Password", key="reset_pwd_btn", type="primary", use_container_width=True):
+                            if not new_pwd or new_pwd != confirm_pwd:
+                                st.error("Passwords must match and cannot be empty")
+                            else:
+                                st.success("Password reset complete. You can now login.")
+                                st.session_state["auth_mode"] = "login"
+                                st.rerun()
+
+                    elif st.session_state["auth_mode"] == "otp_verification":
+                        st.markdown(
+                            """
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; margin-top: 10px;">
+                                <div style="width: 46px; height: 46px; background-color: #EFF6FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" style="fill: #4169E1;">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #111827; font-family: 'Inter', sans-serif;">Verify OTP Code</h3>
+                                    <p style="margin: 0; font-size: 13px; color: #6B7280;">Enter the 6-digit confirmation code we sent to your email.</p>
+                                </div>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                        
+                        # OTP 6 Digit Grid Columns
+                        col_otp = st.columns(6)
+                        otp_val = []
+                        for i in range(6):
+                            with col_otp[i]:
+                                digit = st.text_input("", key=f"otp_{i}", placeholder="-", max_chars=1, label_visibility="collapsed")
+                                otp_val.append(digit)
+                        
+                        st.markdown(
+                            """
+                            <div style="display: flex; justify-content: space-between; margin-top: 10px; margin-bottom: 20px;">
+                                <span style="font-size: 11px; color: #6B7280;">Code expires in <strong style="color: #4169E1;">01:58</strong></span>
+                                <a href="#" style="font-size: 11px; color: #4169E1; font-weight: 600; text-decoration: none;">Resend Code</a>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                        
+                        if st.button("Verify & Activate", key="otp_verify_btn", type="primary", use_container_width=True):
+                            st.success("Verification successful! Profile activated.")
+                            st.session_state["auth_mode"] = "login"
+                            st.rerun()
+
+                    elif st.session_state["auth_mode"] == "email_verification":
+                        st.markdown(
+                            """
+                            <div style="text-align: center; margin-top: 20px; margin-bottom: 25px;">
+                                <div style="font-size: 48px; margin-bottom: 15px;">✉️</div>
+                                <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #111827; font-family: 'Inter', sans-serif;">Check your email inbox</h3>
+                                <p style="margin: 8px 0 0 0; font-size: 13px; color: #6B7280; line-height: 1.5;">
+                                    We have sent a secure recovery link to your email address.<br/>
+                                    Please click on the link to reset your account credentials.
+                                </p>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                        
+                        st.button("Open Email Client", key="open_email_client_btn", type="primary", use_container_width=True)
+                        
+                        st.markdown(
+                            """
+                            <div style="text-align: center; margin-top: 20px;">
+                                <span style="font-size: 12px; color: #6B7280;">Didn't receive instructions? <a href="#" style="color: #4169E1; font-weight: 600; text-decoration: none;">Resend Link</a></span>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                        
+                        st.write("")
+                        if st.button("Back to Log in", key="back_to_login_email", use_container_width=True):
+                            st.session_state["auth_mode"] = "login"
+                            st.rerun()
