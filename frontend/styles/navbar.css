@@ -1,0 +1,148 @@
+/* ==========================================================================
+   SCHEMASAY DESIGN SYSTEM — NAVBAR.CSS
+   Scoped styles for the layout, left workspace/page titles, connection badge,
+   right control buttons, theme toggle moon, user avatar initial circle,
+   and profile chevron.
+   ========================================================================== */
+
+.navbar-outer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding: 0 var(--spacing-xl);
+    background-color: var(--color-bg-card);
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+    width: 100%;
+}
+
+/* ── 1. LEFT SECTION ─────────────────────────────────────────────────────── */
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xl);
+}
+
+.navbar-title-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar-title {
+    font-family: var(--font-display);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    line-height: 1.1;
+}
+
+.navbar-breadcrumb {
+    font-size: 10px;
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+    margin-top: 2px;
+}
+
+.navbar-conn-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background-color: var(--color-success-bg);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    border-radius: var(--radius-pill);
+    color: var(--color-success);
+    font-size: 11px;
+    font-weight: var(--font-weight-semibold);
+}
+
+.conn-status-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-success);
+    border-radius: 50%;
+}
+
+/* ── 2. RIGHT SECTION ────────────────────────────────────────────────────── */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.navbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition-fast);
+}
+
+.navbar-icon-btn:hover {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.navbar-notification-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-danger);
+    border-radius: 50%;
+    border: 1.5px solid var(--color-bg-card);
+}
+
+.navbar-user-profile {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding-left: 14px;
+    border-left: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.navbar-user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+    color: var(--color-text-inverse);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: var(--font-weight-bold);
+}
+
+.navbar-user-name {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.navbar-user-chevron {
+    display: flex;
+    align-items: center;
+    color: var(--color-text-muted);
+    transition: var(--transition-fast);
+}
+
+.navbar-user-profile:hover .navbar-user-chevron {
+    color: var(--color-text-primary);
+}

@@ -51,10 +51,21 @@ with st.spinner("Verifying session..."):
     response = api_client.get_me(token)
 
 if response.status_code == 200:
-    # Load sidebar CSS overrides
-    _load_css("sidebar.css")
+    # Extract user profile data to dynamically populate header avatars
+    user_data = response.json()
+    display_name = user_data.get("full_name") or user_data.get("email") or "User"
     
-    # Render layout with modular sidebar component
+    initials = "US"
+    parts = display_name.split()
+    if len(parts) >= 2:
+        initials = (parts[0][0] + parts[1][0]).upper()
+    elif len(parts) == 1 and len(parts[0]) >= 2:
+        initials = parts[0][:2].upper()
+
+    # Load layout stylesheets
+    _load_css("sidebar.css")
+    _load_css("navbar.css")
+    
     # Extract tip index query param to enable dynamic quick tip rotation
     active_tip = 0
     try:
@@ -64,12 +75,15 @@ if response.status_code == 200:
         pass
 
     from components.sidebar import render_sidebar
+    from components.navbar import render_navbar
+    
     sidebar_content = render_sidebar(active_tip).replace("\n", "")
+    navbar_content = render_navbar(title="Dashboard", display_name=display_name, initials=initials).replace("\n", "")
     
     layout_html = (
         '<div class="app-layout-wrapper">'
         f'<aside class="sidebar-container-shell">{sidebar_content}</aside>'
-        '<main class="main-content-container-shell"><!-- Main Content Container: Empty for now --></main>'
+        f'<main class="main-content-container-shell">{navbar_content}<div class="main-page-canvas"><!-- Empty Canvas Area --></div></main>'
         '</div>'
     )
     st.markdown(layout_html, unsafe_allow_html=True)
