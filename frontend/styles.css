@@ -1177,3 +1177,222 @@ section[data-testid="stSidebar"] {
     color: var(--color-text-primary) !important;
     background-color: var(--color-bg-app) !important;
 }
+
+/* ==========================================================================
+   PHASE 4 — ANALYTICS WORKSPACE
+   ========================================================================== */
+
+/* Schema Explorer Tree styles */
+.schema-search-input {
+    width: 100% !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 12px !important;
+    padding: var(--spacing-2) var(--spacing-3) !important;
+    background-color: var(--color-bg-app) !important;
+    border: var(--border-width) var(--border-style) var(--color-border) !important;
+    border-radius: var(--radius-md) !important;
+    outline: none !important;
+    color: var(--color-text-primary) !important;
+    transition: all 0.15s ease-in-out;
+}
+
+.schema-search-input:focus {
+    border-color: var(--color-primary) !important;
+    background-color: #FFFFFF !important;
+    box-shadow: 0 0 0 3px var(--color-focus-ring) !important;
+}
+
+.schema-tree-node {
+    display: flex;
+    align-items: center;
+    padding: 6px var(--spacing-3);
+    font-size: 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.1s ease-in-out;
+}
+
+.schema-tree-node:hover {
+    background-color: var(--color-hover-bg);
+}
+
+/* Indent structure */
+.schema-level-1 {
+    padding-left: var(--spacing-2);
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.schema-level-2 {
+    padding-left: var(--spacing-6);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.schema-level-3 {
+    padding-left: calc(var(--spacing-6) * 2);
+    color: var(--color-text-secondary);
+}
+
+/* Icon / Badges indicators inside explorer */
+.schema-arrow {
+    font-size: 8px;
+    color: var(--color-text-muted);
+    width: 12px;
+    margin-right: 4px;
+}
+
+.schema-icon {
+    font-size: 13px;
+    margin-right: 6px;
+}
+
+.schema-node-name {
+    flex-grow: 1;
+}
+
+.schema-badge {
+    background-color: var(--color-divider);
+    color: var(--color-text-secondary);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: var(--radius-pill);
+}
+
+.active-table {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+    font-weight: 600;
+}
+.active-table:hover {
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+.schema-pk-icon {
+    font-size: 11px;
+    margin-right: 6px;
+    color: #F59E0B;
+}
+
+.schema-bullet {
+    color: var(--color-text-muted);
+    margin-right: 6px;
+    font-size: 12px;
+}
+
+.schema-type-label {
+    color: var(--color-text-muted);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin-left: var(--spacing-2);
+}
+
+/* Results Custom Tab Swapping */
+.tabs-header-bar {
+    display: flex;
+    border-bottom: 2px solid var(--color-divider);
+    margin-bottom: var(--spacing-4);
+}
+
+.tab-item {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    padding: 8px var(--spacing-4);
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+}
+
+.tab-item:hover {
+    color: var(--color-primary);
+}
+
+.tab-item.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+}
+
+/* Search Row in results pane */
+.results-search-input {
+    width: 100% !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+    background-color: var(--color-surface) !important;
+    border: var(--border-width) var(--border-style) var(--color-border) !important;
+    border-radius: var(--radius-md) !important;
+    outline: none !important;
+    color: var(--color-text-primary) !important;
+    transition: all 0.15s ease-in-out;
+}
+
+.results-search-input:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 3px var(--color-focus-ring) !important;
+}
+
+/* Results table pagination styles overrides */
+.pagination-right-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+}
+
+.pagination-buttons {
+    display: flex;
+    gap: var(--spacing-1);
+}
+
+.pagination-btn-nav,
+.pagination-btn-num {
+    background-color: var(--color-surface) !important;
+    border: var(--border-width) var(--border-style) var(--color-border) !important;
+    border-radius: 6px !important;
+    color: var(--color-text-secondary) !important;
+    width: 28px !important;
+    height: 28px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px !important;
+    font-weight: 500;
+    transition: all 0.15s ease-in-out;
+}
+
+.pagination-btn-nav:hover,
+.pagination-btn-num:hover {
+    border-color: var(--color-border-hover) !important;
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-app) !important;
+}
+
+.pagination-btn-num.active {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: #FFFFFF !important;
+    font-weight: 600;
+}
+
+.pagination-select {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    padding: 4px 8px;
+    border: var(--border-width) var(--border-style) var(--color-border);
+    border-radius: 6px;
+    color: var(--color-text-secondary);
+    background-color: var(--color-surface);
+    outline: none;
+    cursor: pointer;
+}
+
+.pagination-select:hover {
+    border-color: var(--color-border-hover);
+}

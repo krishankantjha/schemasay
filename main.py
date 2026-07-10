@@ -59,12 +59,82 @@ st.sidebar.markdown(
 # 5. Proportional Three-Column Content Wrapper Grid
 col_left, col_center, col_right = st.columns([1.2, 3.2, 1.3], gap="medium")
 
-# Column 1: Schema Explorer placeholder card
+# Column 1: Schema Explorer tall card
 with col_left:
     st.markdown(
         """
-        <div class="placeholder-card card-tall">
-            <div class="placeholder-title">Schema Explorer</div>
+        <div class="workspace-card card-tall" style="display: flex; flex-direction: column;">
+            <div class="card-header-row" style="margin-bottom: 12px;">
+                <div class="card-header-title">Schema Explorer</div>
+            </div>
+            <div class="schema-search-container" style="margin-bottom: 12px;">
+                <input type="text" class="schema-search-input" placeholder="Search tables or columns..." />
+            </div>
+            <div class="schema-tree-scroll" style="flex-grow: 1; overflow-y: auto;">
+                <!-- Schema level node -->
+                <div class="schema-tree-node schema-level-1">
+                    <span class="schema-arrow">▼</span>
+                    <span class="schema-icon">🗄️</span>
+                    <span class="schema-node-name">public</span>
+                    <span class="schema-badge">12</span>
+                </div>
+                
+                <!-- Expanded Table level node -->
+                <div class="schema-tree-node schema-level-2 active-table">
+                    <span class="schema-arrow">▼</span>
+                    <span class="schema-icon">📋</span>
+                    <span class="schema-node-name">orders</span>
+                </div>
+                
+                <!-- Columns -->
+                <div class="schema-tree-node schema-level-3">
+                    <span class="schema-pk-icon">🔑</span>
+                    <span class="schema-node-name">order_id</span>
+                    <span class="schema-type-label">INT</span>
+                </div>
+                <div class="schema-tree-node schema-level-3">
+                    <span class="schema-bullet">•</span>
+                    <span class="schema-node-name">customer_id</span>
+                    <span class="schema-type-label">INT</span>
+                </div>
+                <div class="schema-tree-node schema-level-3">
+                    <span class="schema-bullet">•</span>
+                    <span class="schema-node-name">order_date</span>
+                    <span class="schema-type-label">DATE</span>
+                </div>
+                <div class="schema-tree-node schema-level-3">
+                    <span class="schema-bullet">•</span>
+                    <span class="schema-node-name">total_amount</span>
+                    <span class="schema-type-label">NUMERIC</span>
+                </div>
+                <div class="schema-tree-node schema-level-3">
+                    <span class="schema-bullet">•</span>
+                    <span class="schema-node-name">status</span>
+                    <span class="schema-type-label">VARCHAR</span>
+                </div>
+
+                <!-- Collapsed Sibling Tables -->
+                <div class="schema-tree-node schema-level-2">
+                    <span class="schema-arrow">▶</span>
+                    <span class="schema-icon">📋</span>
+                    <span class="schema-node-name">customers</span>
+                </div>
+                <div class="schema-tree-node schema-level-2">
+                    <span class="schema-arrow">▶</span>
+                    <span class="schema-icon">📋</span>
+                    <span class="schema-node-name">products</span>
+                </div>
+                <div class="schema-tree-node schema-level-2">
+                    <span class="schema-arrow">▶</span>
+                    <span class="schema-icon">📋</span>
+                    <span class="schema-node-name">order_items</span>
+                </div>
+                <div class="schema-tree-node schema-level-2">
+                    <span class="schema-arrow">▶</span>
+                    <span class="schema-icon">📋</span>
+                    <span class="schema-node-name">categories</span>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True
@@ -143,8 +213,86 @@ with col_center:
     
     st.markdown(
         """
-        <div class="placeholder-card card-large">
-            <div class="placeholder-title">Results Area</div>
+        <div class="workspace-card card-large" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div class="tabs-header-bar" style="margin-bottom: 12px;">
+                    <div class="tab-item active">Results</div>
+                    <div class="tab-item">Visualizations</div>
+                    <div class="tab-item">Insights</div>
+                </div>
+                <div class="results-search-row" style="margin-bottom: 12px;">
+                    <input type="text" class="results-search-input" placeholder="🔍 Search results..." />
+                </div>
+                <div class="table-container">
+                    <table class="data-table data-table-striped">
+                        <thead>
+                            <tr>
+                                <th class="table-th-sortable table-th-sorted-asc">month</th>
+                                <th class="table-th-sortable">total_sales</th>
+                                <th class="table-th-sortable">order_count</th>
+                                <th class="table-th-sortable">avg_order_value</th>
+                                <th class="table-th-sortable">new_customers</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2024-01-01</td>
+                                <td>98,420.50</td>
+                                <td>1,243</td>
+                                <td>79.23</td>
+                                <td>342</td>
+                            </tr>
+                            <tr>
+                                <td>2024-02-01</td>
+                                <td>110,250.75</td>
+                                <td>1,512</td>
+                                <td>72.88</td>
+                                <td>421</td>
+                            </tr>
+                            <tr>
+                                <td>2024-03-01</td>
+                                <td>125,630.20</td>
+                                <td>1,785</td>
+                                <td>70.41</td>
+                                <td>512</td>
+                            </tr>
+                            <tr>
+                                <td>2024-04-01</td>
+                                <td>132,980.60</td>
+                                <td>1,958</td>
+                                <td>67.98</td>
+                                <td>480</td>
+                            </tr>
+                            <tr>
+                                <td>2024-05-01</td>
+                                <td>142,770.90</td>
+                                <td>2,104</td>
+                                <td>67.83</td>
+                                <td>567</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="table-pagination-bar" style="margin-top: 12px;">
+                <div>Showing 1 to 5 of 12 results</div>
+                <div class="pagination-right-group">
+                    <div class="pagination-buttons">
+                        <button class="pagination-btn-nav">&lt;</button>
+                        <button class="pagination-btn-num active">1</button>
+                        <button class="pagination-btn-num">2</button>
+                        <button class="pagination-btn-num">3</button>
+                        <button class="pagination-btn-nav">&gt;</button>
+                    </div>
+                    <div class="pagination-dropdown-wrapper">
+                        <select class="pagination-select">
+                            <option>5 / page</option>
+                            <option>10 / page</option>
+                            <option>25 / page</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True
