@@ -30,13 +30,16 @@ def mock_streamlit():
 
 def test_session_state_initialization(mock_streamlit):
     """
-    Verifies that the state manager initializes session state attributes.
+    Verifies that the state manager initializes required session state keys
+    with correct default values. Dashboard-only keys (active tab, workbench
+    SQL) were removed during frontend cleanup and are no longer tested here.
     """
-    from frontend.state import init_session_state, KEY_ACTIVE_TAB, KEY_WORKBENCH_SQL
-    
+    from frontend.state import init_session_state, KEY_ACTIVE_CONNECTION_ID
+
     init_session_state()
-    assert mock_streamlit["state"][KEY_ACTIVE_TAB] == "AI Copilot"
-    assert "SELECT * FROM" in mock_streamlit["state"][KEY_WORKBENCH_SQL]
+    # KEY_ACTIVE_CONNECTION_ID must be initialized to None by default
+    assert KEY_ACTIVE_CONNECTION_ID in mock_streamlit["state"]
+    assert mock_streamlit["state"][KEY_ACTIVE_CONNECTION_ID] is None
 
 def test_session_state_clear(mock_streamlit):
     """

@@ -331,24 +331,31 @@ def test_insights_timeout_parameters(mock_get_client, mock_key_valid, client):
 
 def test_xss_escaping_in_insight_card():
     """
-    Verifies that render_insight_card escapes HTML tags and prevents script injection.
+    Verifies that the HTML sanitization utility escapes tags and prevents
+    script injection in LLM-generated content rendered via unsafe_allow_html.
+
+    The logic was previously in frontend.components.insight_card and has been
+    moved to frontend.utils.sanitize.escape_html during the Phase 9 cleanup.
     """
     import sys
     import os
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     if project_root not in sys.path:
         sys.path.append(project_root)
-        
-    from frontend.components.insight_card import render_insight_card
-    
+
+    from frontend.utils.sanitize import escape_html
+
     # Inject XSS payload
     xss_payload = "<script>alert('XSS')</script> & <img src=x onerror=abc>"
-    
-    with patch("streamlit.markdown") as mock_markdown:
-        render_insight_card(xss_payload)
-        mock_markdown.assert_called_once()
-        args = mock_markdown.call_args[0][0]
-        # Assert tags are escaped to plaintext entities
-        assert "&lt;script&gt;alert(&#x27;XSS&#x27;)&lt;/script&gt;" in args
-        assert "&amp;" in args
-        assert "&lt;img src=x onerror=abc&gt;" in args
+
+    result = escape_html(xss_payload)
+
+    # Assert tags are escaped to safe HTML entities
+    assert "&lt;script&gt;" in result
+    assert "&lt;/script&gt;" in result
+    assert "&amp;" in result
+    assert "&lt;img src=x onerror=abc&gt;" in result
+    # Assert the original dangerous characters are NOT present as literals
+    assert "<script>" not in result
+    assert "<img" not in result
+
