@@ -8,7 +8,7 @@ Now fully dynamic, supporting clickable Quick Tip pagination rotation.
 
 # Reusable list of platform tips
 TIPS = [
-    "Use natural language in AI Copilot to generate complex SQL queries instantly.",
+    "Use natural language in SchemaSay AI to generate complex SQL queries instantly.",
     "Select your database connection source from the top navbar to start browsing tables.",
     "Click Format SQL in the Workbench to clean up raw SQL queries automatically.",
     "Save your favorite SQL queries to access them quickly from your Query History."
@@ -204,7 +204,7 @@ def render_sidebar(active_tip: int = 0) -> str:
             <li>
                 <a href="#" class="nav-item">
                     <span class="nav-item-icon">{copilot_svg}</span>
-                    <span>AI Copilot</span>
+                    <span>SchemaSay AI</span>
                 </a>
             </li>
             <li>
