@@ -1,0 +1,180 @@
+/* ==========================================================================
+   SCHEMASAY DESIGN SYSTEM — SIDEBAR.CSS
+   Scoped styles for the layout, logo, primary navigation items list,
+   active indicator tabs, hover statuses, and the Quick Tip container card.
+   ========================================================================== */
+
+/* Outer scrollable list container */
+.sidebar-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* ── 1. LOGO SECTION ────────────────────────────────────────────────────── */
+.sidebar-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xl);
+    padding: 0 var(--spacing-xs);
+    flex-shrink: 0;
+}
+
+.sidebar-logo-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    text-decoration: none;
+}
+
+.sidebar-logo-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.sidebar-logo-text {
+    font-family: var(--font-display);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-inverse);
+    letter-spacing: -0.03em;
+}
+
+.sidebar-logo-accent {
+    color: #60A5FA;
+}
+
+.sidebar-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.sidebar-menu-toggle:hover {
+    color: var(--color-text-inverse);
+}
+
+/* ── 2. NAVIGATION LISTS ─────────────────────────────────────────────────── */
+.sidebar-menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: 10px 14px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-base);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+    color: var(--color-text-inverse);
+}
+
+.nav-item.active {
+    background-color: var(--color-primary) !important;
+    color: var(--color-text-inverse) !important;
+    font-weight: var(--font-weight-semibold);
+}
+
+.nav-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: inherit;
+}
+
+/* ── 3. SEPARATORS ───────────────────────────────────────────────────────── */
+.sidebar-divider {
+    height: 1px;
+    background-color: var(--color-border-subtle);
+    margin: var(--spacing-lg) 0;
+    flex-shrink: 0;
+}
+
+/* ── 4. LOGOUT ACTION ────────────────────────────────────────────────────── */
+.logout-item {
+    color: #EF4444; /* Alert soft red matching sidebar */
+}
+
+.logout-item:hover {
+    background-color: rgba(239, 68, 68, 0.08) !important;
+    color: #EF4444 !important;
+}
+
+/* ── 5. QUICK TIP CARD ───────────────────────────────────────────────────── */
+.quick-tip-card {
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-top: auto; /* Push card to the bottom of the container */
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.quick-tip-icon {
+    display: flex;
+    align-items: center;
+    color: #F59E0B; /* Bright amber lightbulb color */
+    margin-bottom: var(--spacing-sm);
+}
+
+.quick-tip-title {
+    font-family: var(--font-display);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-inverse);
+    margin-bottom: var(--spacing-xs);
+}
+
+.quick-tip-desc {
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-md);
+}
+
+.quick-tip-pagination {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.pagination-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.pagination-dot.active {
+    background-color: var(--color-primary);
+    width: 14px;
+    border-radius: var(--radius-pill);
+}

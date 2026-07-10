@@ -51,15 +51,21 @@ with st.spinner("Verifying session..."):
     response = api_client.get_me(token)
 
 if response.status_code == 200:
-    # Render foundational page layout containers (Sidebar + Main Content)
+    # Load sidebar CSS overrides
+    _load_css("sidebar.css")
+    
+    # Render layout with modular sidebar component
+    from components.sidebar import render_sidebar
+    sidebar_content = render_sidebar()
+    
     st.markdown(
-        """
+        f"""
         <div class="app-layout-wrapper">
             <aside class="sidebar-container-shell">
-                <!-- Sidebar Container: Empty for Phase 1 -->
+                {sidebar_content}
             </aside>
             <main class="main-content-container-shell">
-                <!-- Main Content Container: Empty for Phase 1 -->
+                <!-- Main Content Container: Empty for now -->
             </main>
         </div>
         """,
