@@ -24,7 +24,7 @@
     flex-shrink: 0;
 }
 
-/* ── 1. ROW 1 COLUMNS (AI Copilot & SQL Workbench) ───────────────────────── */
+/* ── 1. ROW 1 COLUMNS (SchemaSay AI & SQL Workbench) ───────────────────────── */
 .col-row1-left {
     flex: 1;
     display: flex;

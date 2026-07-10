@@ -66,6 +66,7 @@ if response.status_code == 200:
     _load_css("sidebar.css")
     _load_css("navbar.css")
     _load_css("dashboard_layout.css")
+    _load_css("schemasay_ai.css")
     
     # Extract tip index query param to enable dynamic quick tip rotation
     active_tip = 0
@@ -77,20 +78,60 @@ if response.status_code == 200:
 
     from components.sidebar import render_sidebar
     from components.navbar import render_navbar
-    from components.dashboard_layout import render_dashboard_layout
+    from components.schemasay_ai import render_ai_copilot_panel
     
     sidebar_content = render_sidebar(active_tip).replace("\n", "")
     navbar_content = render_navbar(title="Dashboard", display_name=display_name, initials=initials).replace("\n", "")
-    dashboard_content = render_dashboard_layout().replace("\n", "")
     
-    layout_html = (
-        '<div class="app-layout-wrapper">'
+    # ── 1. Open Layout Containers ─────────────────────────────────────────────
+    # Opens layout wrappers, let Streamlit draw widget columns inside them
+    st.markdown(
+        f'<div class="app-layout-wrapper">'
         f'<aside class="sidebar-container-shell">{sidebar_content}</aside>'
-        f'<main class="main-content-container-shell">{navbar_content}{dashboard_content}</main>'
-        '</div>'
+        f'<main class="main-content-container-shell">{navbar_content}'
+        f'<div class="dashboard-container">', 
+        unsafe_allow_html=True
     )
-    st.markdown(layout_html, unsafe_allow_html=True)
-    st.stop()
+    
+    # ── 2. Row 1: SchemaSay AI & SQL Workbench ────────────────────────────────
+    row1_col1, row1_col2 = st.columns([1, 1.1])
+    with row1_col1:
+        st.markdown('<div class="dashboard-card card-r1-left">', unsafe_allow_html=True)
+        render_ai_copilot_panel()
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    with row1_col2:
+        st.markdown('<div class="dashboard-card card-r1-right">', unsafe_allow_html=True)
+        # SQL Workbench Card (Empty for Phase 5)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    # ── 3. Row 2: Schema Explorer, Center tabs, Right feeds ───────────────────
+    row2_col1, row2_col2, row2_col3 = st.columns([1.2, 3.2, 1.3])
+    with row2_col1:
+        st.markdown('<div class="dashboard-card card-r2-left">', unsafe_allow_html=True)
+        # Schema Explorer Card (Empty for Phase 5)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    with row2_col2:
+        st.markdown('<div class="dashboard-card card-r2-center">', unsafe_allow_html=True)
+        # Center Panel Tabs Card (Empty for Phase 5)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    with row2_col3:
+        st.markdown('<div class="dashboard-card card-r2-right">', unsafe_allow_html=True)
+        # Right Feeds Card (Empty for Phase 5)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    # ── 4. Row 3: Full Width Container ────────────────────────────────────────
+    st.markdown(
+        '<div class="col-row3-full">'
+        '<div class="dashboard-card card-r3-full"></div>'
+        '</div>',
+        unsafe_allow_html=True
+    )
+    
+    # ── 5. Close Layout Containers ────────────────────────────────────────────
+    st.markdown('</div></main></div>', unsafe_allow_html=True)
 
 elif response.status_code == 401 and KEY_REFRESH_TOKEN in st.session_state:
     # Access token expired — attempt silent refresh
