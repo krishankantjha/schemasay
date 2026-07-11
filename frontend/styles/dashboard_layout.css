@@ -19,21 +19,27 @@ div[data-testid="stVerticalBlockBorderWrapper"]:hover {
     box-shadow: var(--shadow-hover) !important;
 }
 
-/* ── 2. CARD SIZES (Using CSS :has selector based on child height tags) ───── */
-div[data-testid="stVerticalBlockBorderWrapper"]:has(.card-height-r1) {
-    height: 280px !important;
+/* ── 2. WORKSPACE GRID CARD SIZES & ALIGNMENTS ───────────────────────────── */
+/* Row 1 cards */
+div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_ai_copilot_card"]),
+div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_sql_workbench_card"]) {
+    height: 250px !important;
     display: flex;
     flex-direction: column;
 }
 
-div[data-testid="stVerticalBlockBorderWrapper"]:has(.card-height-r2) {
-    height: 490px !important;
+/* Row 2 cards */
+div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_schema_explorer_card"]),
+div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_results_workspace_card"]) {
+    height: 480px !important;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
 
-div[data-testid="stVerticalBlockBorderWrapper"]:has(.card-height-r3) {
-    height: 90px !important;
+div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_query_history_card"]),
+div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_ai_insights_card"]) {
+    height: 228px !important;
     display: flex;
     flex-direction: column;
 }
@@ -52,11 +58,17 @@ div[data-testid="stVerticalBlockBorderWrapper"] div[data-testid="stVerticalBlock
 
 /* ── 4. RESPONSIVE HEIGHT OVERRIDES ──────────────────────────────────────── */
 @media (max-width: 1440px) {
-    div[data-testid="stVerticalBlockBorderWrapper"]:has(.card-height-r1) {
-        height: 260px !important;
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_ai_copilot_card"]),
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_sql_workbench_card"]) {
+        height: 240px !important;
     }
-    div[data-testid="stVerticalBlockBorderWrapper"]:has(.card-height-r2) {
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_schema_explorer_card"]),
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_results_workspace_card"]) {
         height: 450px !important;
+    }
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_query_history_card"]),
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(div[data-key="dash_ai_insights_card"]) {
+        height: 212px !important;
     }
 }
 
