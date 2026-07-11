@@ -44,16 +44,33 @@ cached_user_data = st.session_state.get("cached_profile_data", None)
 status_code = None
 
 if not verified or cached_user_data is None:
-    with st.spinner("Verifying session..."):
-        response = api_client.get_me(token)
-    
-    if response.status_code == 200:
-        cached_user_data = response.json()
-        st.session_state.profile_verified = True
-        st.session_state.cached_profile_data = cached_user_data
-        status_code = 200
-    else:
-        status_code = response.status_code
+    try:
+        with st.spinner("Verifying session..."):
+            response = api_client.get_me(token)
+        if response.status_code == 200:
+            cached_user_data = response.json()
+            st.session_state.profile_verified = True
+            st.session_state.cached_profile_data = cached_user_data
+            status_code = 200
+        elif response.status_code == 401:
+            # Genuine auth failure — trigger refresh flow
+            status_code = 401
+        else:
+            # Backend is temporarily unavailable (503, 500, etc.)
+            # If we have a cached profile, stay logged in rather than force-logout
+            if cached_user_data is not None:
+                status_code = 200
+            else:
+                status_code = response.status_code
+    except Exception:
+        # Network/connection error (e.g. backend cold-starting on Render)
+        # If we have a cached profile, stay logged in silently
+        if cached_user_data is not None:
+            status_code = 200
+        else:
+            # No cached data and can't reach backend — show gentle error, don't force logout
+            st.warning("⚠️ Could not reach the server. Please check your connection and try again.")
+            st.stop()
 else:
     status_code = 200
 
