@@ -2,8 +2,7 @@ import os
 import streamlit as st
 from api_client import api_client
 from views.auth_view import show_auth_page
-from state import KEY_TOKEN, KEY_REFRESH_TOKEN, init_session_state
-from services.state_manager import init_application_states
+from state import KEY_TOKEN, KEY_REFRESH_TOKEN, KEY_ACTIVE_CONNECTION_ID, init_session_state
 
 # ── Page Configuration ────────────────────────────────────────────────────────
 st.set_page_config(
@@ -25,7 +24,6 @@ _load_css("globals.css")
 
 # ── Session State Initialization ──────────────────────────────────────────────
 init_session_state()
-init_application_states()
 
 # ── Auth Gate ─────────────────────────────────────────────────────────────────
 if KEY_TOKEN not in st.session_state:
@@ -68,6 +66,11 @@ if status_code == 200:
         initials = parts[0][:2].upper()
 
     # ── Action Bus Event Interceptor ──────────────────────────────────────────
+    if "prompt" in st.query_params:
+        st.session_state.prompt_text = st.query_params["prompt"]
+        st.query_params.pop("prompt", None)
+        st.rerun()
+
     if "action" in st.query_params:
         action = st.query_params["action"]
         
@@ -117,6 +120,11 @@ if status_code == 200:
             st.session_state.show_logout_dialog = True
             st.session_state.profile_open = False
         elif action == "confirm_logout":
+            # Invalidate backend JWT session token before clearing local state variables
+            try:
+                api_client.logout(token)
+            except Exception:
+                pass
             from state import clear_session_state
             clear_session_state()
             st.session_state.show_logout_dialog = False
@@ -199,6 +207,81 @@ if status_code == 200:
     
     # Render Top Navbar sticky at the top of main content block
     st.markdown(navbar_content, unsafe_allow_html=True)
+
+    # ── 1.5 Render Main Page View Layouts ─────────────────────────────────────
+    if active_nav_id == "schemasay_ai":
+        # Process SQL generation via real backend FastAPI endpoint
+        if st.session_state.get("sql_generation_status") == "loading":
+            token = st.session_state[KEY_TOKEN]
+            connection_id = st.session_state.get(KEY_ACTIVE_CONNECTION_ID)
+            
+            # Fetch connections dynamically if not cached/defaulted yet
+            if not connection_id:
+                try:
+                    from utils.caching import get_cached_connections
+                    conns = get_cached_connections(token)
+                    if conns:
+                        connection_id = conns[0]["id"]
+                        st.session_state[KEY_ACTIVE_CONNECTION_ID] = connection_id
+                except Exception:
+                    pass
+            
+            if not connection_id:
+                st.session_state.error_message = "No configured database connections found. Please configure a connection first under the Connections menu."
+                st.session_state.sql_generation_status = "error"
+                st.rerun()
+            else:
+                with st.spinner("Translating natural prompt into SQL structure..."):
+                    try:
+                        response = api_client.query_assistant(token, connection_id, st.session_state.prompt_text)
+                        if response.status_code == 200:
+                            res_data = response.json()
+                            st.session_state.generated_sql = res_data.get("sql", "")
+                            st.session_state.sql_generation_status = "success"
+                            
+                            # Append to recent prompts
+                            if st.session_state.prompt_text not in st.session_state.recent_prompts:
+                                st.session_state.recent_prompts.append(st.session_state.prompt_text)
+                        else:
+                            try:
+                                err_detail = response.json().get("detail", "Failed to compile SQL query.")
+                            except Exception:
+                                err_detail = f"Database server error: {response.text[:200]}"
+                            st.session_state.error_message = err_detail
+                            st.session_state.sql_generation_status = "error"
+                    except Exception as e:
+                        st.session_state.error_message = f"Backend connection failed: {str(e)}"
+                        st.session_state.sql_generation_status = "error"
+                st.rerun()
+
+        # Render the AI Copilot UI
+        from components.schemasay_ai import render_ai_copilot_panel
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        # Double-container layout with empty slots matching visual mockup
+        row1_col1, row1_col2 = st.columns([1, 1.1])
+        with row1_col1:
+            with st.container(border=True):
+                st.markdown('<div class="card-height-r1"></div>', unsafe_allow_html=True)
+                render_ai_copilot_panel()
+        with row1_col2:
+            with st.container(border=True):
+                st.markdown('<div class="card-height-r1"></div>', unsafe_allow_html=True)
+                st.write("#### SQL Workbench")
+                st.info("Select a query or type SQL directly to run execution plans.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif active_nav_id == "connections":
+        from views.connect_view import show_connection_manager
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        show_connection_manager()
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    elif active_nav_id != "dashboard":
+        # Default placeholder views for other items
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        st.write(f"### {page_title}")
+        st.info(f"The {page_title} dashboard module is loaded successfully.")
+        st.markdown('</div>', unsafe_allow_html=True)
     
     # ── 2. Render Confirm Logout Dialogue Modal ──────────────────────────────
     if st.session_state.get("show_logout_dialog", False):
