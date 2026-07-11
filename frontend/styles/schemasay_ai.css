@@ -155,9 +155,9 @@
 
 /* ── 5. GENERATED SQL PREVIEW CARD ───────────────────────────────────────── */
 .sql-preview-container {
-    background-color: #0F172A; /* Dark codeblock background */
+    background-color: #F8FAFC; /* Light mockup codeblock background */
     border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid #E2E8F0;
     padding: 10px 12px;
     margin-top: 10px;
     display: flex;
@@ -183,10 +183,10 @@
 }
 
 .sql-preview-copy-btn {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
     border-radius: var(--radius-sm);
-    color: #94A3B8;
+    color: #475569;
     font-size: 9px;
     font-weight: var(--font-weight-semibold);
     padding: 2px 6px;
@@ -196,15 +196,15 @@
 }
 
 .sql-preview-copy-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #FFFFFF;
-    border-color: rgba(255, 255, 255, 0.15);
+    background: #F1F5F9;
+    color: #0F172A;
+    border-color: #94A3B8;
 }
 
 .sql-preview-code {
     font-family: var(--font-mono) !important;
     font-size: 11px !important;
-    color: #38BDF8 !important; /* Sky Blue accent color for SQL syntax */
+    color: #0F172A !important; /* Dark text command code styling */
     margin: 0;
     white-space: pre-wrap;
     word-break: break-all;
@@ -219,7 +219,7 @@
     width: 4px;
 }
 .sql-preview-code::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(100, 116, 139, 0.2);
     border-radius: var(--radius-pill);
 }
 

@@ -12,8 +12,8 @@
     --color-primary-light: rgba(37, 99, 235, 0.08);
     --color-primary-ring: rgba(37, 99, 235, 0.2);
     
-    --color-bg-app: #F8FAFC;           /* App Canvas Gray-Blue */
-    --color-bg-sidebar: #0F172A;       /* Deep Slate Blue */
+    --color-bg-app: #F1F5F9;           /* App Canvas Gray-Blue */
+    --color-bg-sidebar: #0A0F1D;       /* Deep Navy Blue */
     --color-bg-card: #FFFFFF;          /* Pure White */
     --color-bg-input: #FFFFFF;
     
@@ -98,7 +98,16 @@ div[data-testid="stAppViewContainer"], .stApp {
     width: 100vw !important;
 }
 
-/* Eliminate padding on main canvas */
+/* Force Streamlit main body canvas to have zero top padding */
+section[data-testid="stMain"] {
+    background-color: var(--color-bg-app) !important;
+}
+
+section[data-testid="stMain"] > div:first-child {
+    padding-top: 0 !important;
+}
+
+/* Eliminate padding on main block container to stretch navbar full width */
 div[data-testid="block-container"] {
     padding: 0 !important;
     max-width: 100% !important;
@@ -106,6 +115,20 @@ div[data-testid="block-container"] {
     display: flex !important;
     flex-direction: column !important;
     overflow-y: auto !important;
+}
+
+/* Apply gutters padding to all child rows below the full-width navbar */
+div[data-testid="stVerticalBlock"] > div[data-testid="element-container"]:not(:first-child) {
+    padding-left: var(--spacing-xl) !important;
+    padding-right: var(--spacing-xl) !important;
+}
+
+div[data-testid="stVerticalBlock"] > div[data-testid="element-container"]:nth-child(2) {
+    padding-top: var(--spacing-xl) !important;
+}
+
+div[data-testid="stVerticalBlock"] > div[data-testid="element-container"]:last-child {
+    padding-bottom: var(--spacing-xl) !important;
 }
 
 /* Override Streamlit sidebar layout dimensions & paddings */
