@@ -194,6 +194,30 @@ if status_code == 200:
     active_nav_id = st.session_state.get("selected_sidebar_item", "dashboard")
     page_title = PAGE_TITLES.get(active_nav_id, "Dashboard")
 
+    # Dynamic Connection Status Resolver
+    token = st.session_state.get(KEY_TOKEN)
+    if token:
+        try:
+            from utils.caching import get_cached_connections
+            conns = get_cached_connections(token)
+            active_conn_id = st.session_state.get(KEY_ACTIVE_CONNECTION_ID)
+            if not active_conn_id and conns:
+                active_conn_id = conns[0]["id"]
+                st.session_state[KEY_ACTIVE_CONNECTION_ID] = active_conn_id
+            
+            if active_conn_id and conns:
+                active_conn = next((c for c in conns if c["id"] == active_conn_id), None)
+                if active_conn:
+                    st.session_state["connection_status"] = f"Connected to {active_conn['db_type'].upper()}"
+                else:
+                    st.session_state["connection_status"] = "Disconnected"
+            else:
+                st.session_state["connection_status"] = "Disconnected"
+        except Exception:
+            st.session_state["connection_status"] = "Disconnected"
+    else:
+        st.session_state["connection_status"] = "Disconnected"
+
     from components.sidebar import render_sidebar
     from components.navbar import render_navbar
     
