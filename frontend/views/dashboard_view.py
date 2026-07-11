@@ -32,8 +32,7 @@ def show_dashboard_view():
             st.session_state[KEY_ACTIVE_CONNECTION_ID] = active_conn_id
             
     if not active_conn_id:
-        st.warning("No active database connection found. Please configure a connection first under the Connections menu.")
-        return
+        st.warning("⚠️ No active database connection found. Please configure a connection first under the Connections menu.")
 
     # Initialize session values for query results
     if "dash_execution_rows" not in st.session_state:
@@ -77,7 +76,9 @@ def show_dashboard_view():
             col_gen, col_empty = st.columns([1.2, 2.5])
             with col_gen:
                 if st.button("Generate SQL ⚡", type="primary", key="dash_gen_sql_btn", use_container_width=True):
-                    if not prompt_input.strip():
+                    if not active_conn_id:
+                        st.error("No active connection. Please configure a connection first under Connections.")
+                    elif not prompt_input.strip():
                         st.error("Please enter a prompt first.")
                     else:
                         with st.spinner("Translating prompt to SQL..."):
@@ -152,18 +153,21 @@ def show_dashboard_view():
             wb_col1, wb_col2, wb_col3, wb_col4 = st.columns([1.2, 0.5, 0.5, 1.2])
             with wb_col1:
                 if st.button("▶ Run Query", type="primary", key="dash_run_query_btn", use_container_width=True):
-                    with st.spinner("Executing statement..."):
-                        try:
-                            response = api_client.execute_raw_sql(token, active_conn_id, sql_editor_val)
-                            if response.status_code == 200:
-                                rows = response.json().get("rows", [])
-                                st.session_state["dash_execution_rows"] = rows
-                                st.session_state["dash_wb_logs"] = f"Success | Query returned {len(rows)} rows."
-                                st.rerun()
-                            else:
-                                st.session_state["dash_wb_logs"] = f"Failed ({response.status_code}): {response.text[:200]}"
-                        except Exception as e:
-                            st.session_state["dash_wb_logs"] = f"Execution failed: {str(e)}"
+                    if not active_conn_id:
+                        st.session_state["dash_wb_logs"] = "Failed | No active connection configuration found."
+                    else:
+                        with st.spinner("Executing statement..."):
+                            try:
+                                response = api_client.execute_raw_sql(token, active_conn_id, sql_editor_val)
+                                if response.status_code == 200:
+                                    rows = response.json().get("rows", [])
+                                    st.session_state["dash_execution_rows"] = rows
+                                    st.session_state["dash_wb_logs"] = f"Success | Query returned {len(rows)} rows."
+                                    st.rerun()
+                                else:
+                                    st.session_state["dash_wb_logs"] = f"Failed ({response.status_code}): {response.text[:200]}"
+                            except Exception as e:
+                                st.session_state["dash_wb_logs"] = f"Execution failed: {str(e)}"
             with wb_col2:
                 # Format SQL trigger
                 if st.button("🔄", key="dash_format_sql_btn", help="Format SQL query code", use_container_width=True):
@@ -230,14 +234,17 @@ def show_dashboard_view():
                         st.markdown(cols_html, unsafe_allow_html=True)
             
             if st.button("Sync Schema 🔄", key="dash_refresh_schema_btn", use_container_width=True):
-                with st.spinner("Syncing schema reflection..."):
-                    try:
-                        api_client.sync_schema(token, active_conn_id)
-                        st.cache_data.clear()
-                        st.success("Database schemas synced successfully!")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Sync failed: {str(e)}")
+                if not active_conn_id:
+                    st.error("No active connection database. Configure a connection under Connections first.")
+                else:
+                    with st.spinner("Syncing schema reflection..."):
+                        try:
+                            api_client.sync_schema(token, active_conn_id)
+                            st.cache_data.clear()
+                            st.success("Database schemas synced successfully!")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Sync failed: {str(e)}")
 
     # --- Column 2: Results & Visualizations Workspace ---
     with row2_col2:
