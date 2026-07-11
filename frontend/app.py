@@ -49,12 +49,44 @@ if KEY_TOKEN not in st.session_state:
 # ── Token Verification ────────────────────────────────────────────────────────
 token = st.session_state[KEY_TOKEN]
 
-with st.spinner("Verifying session..."):
-    response = api_client.get_me(token)
+# Cache profile data to avoid backend spamming on every rerun/click
+verified = st.session_state.get("profile_verified", False)
+cached_user_data = st.session_state.get("cached_profile_data", None)
 
-if response.status_code == 200:
-    # Extract user profile data to dynamically populate header avatars
-    user_data = response.json()
+if not verified or cached_user_data is None:
+    with st.spinner("Verifying session..."):
+        response = api_client.get_me(token)
+    
+    if response.status_code == 200:
+        cached_user_data = response.json()
+        st.session_state.profile_verified = True
+        st.session_state.cached_profile_data = cached_user_data
+        status_code = 200
+    elif response.status_code == 401 and KEY_REFRESH_TOKEN in st.session_state:
+        # Access token expired — attempt silent refresh
+        with st.spinner("Session expired. Renewing..."):
+            refresh_res = api_client.refresh(st.session_state[KEY_REFRESH_TOKEN])
+        
+        if refresh_res.status_code == 200:
+            res_data = refresh_res.json()
+            st.session_state[KEY_TOKEN] = res_data["access_token"]
+            st.session_state[KEY_REFRESH_TOKEN] = res_data["refresh_token"]
+            st.rerun()
+        else:
+            st.session_state.pop(KEY_TOKEN, None)
+            st.session_state.pop(KEY_REFRESH_TOKEN, None)
+            st.error("Your session has expired. Please log in again.")
+            st.rerun()
+    else:
+        st.session_state.pop(KEY_TOKEN, None)
+        st.session_state.pop(KEY_REFRESH_TOKEN, None)
+        st.error("Authentication failed. Please log in again.")
+        st.rerun()
+else:
+    status_code = 200
+
+if status_code == 200:
+    user_data = cached_user_data
     display_name = user_data.get("full_name") or user_data.get("email") or "User"
     
     initials = "US"
@@ -250,16 +282,13 @@ if response.status_code == 200:
             # Right Feeds (Empty for Phase 5)
             pass
             
-    # ── 4. Row 3: Full Width Container ────────────────────────────────────────
+    # Row 3: Full Width
     with st.container(border=True):
         st.markdown('<div class="card-height-r3"></div>', unsafe_allow_html=True)
-        # Footer Card (Empty for Phase 5)
+        # Footer card (Empty for Phase 5)
         pass
         
     # ── 5. Close Layout Containers ────────────────────────────────────────────
-    st.markdown('</div>', unsafe_allow_html=True)
-
-elif response.status_code == 401 and KEY_REFRESH_TOKEN in st.session_state:
     # Access token expired — attempt silent refresh
     with st.spinner("Session expired. Renewing..."):
         refresh_res = api_client.refresh(st.session_state[KEY_REFRESH_TOKEN])

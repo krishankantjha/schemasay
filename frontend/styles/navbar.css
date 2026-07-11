@@ -1,8 +1,7 @@
 /* ==========================================================================
    SCHEMASAY DESIGN SYSTEM — NAVBAR.CSS
-   Scoped styles for the layout, left workspace/page titles, connection badge,
-   right control buttons, theme toggle moon, user avatar initial circle,
-   and profile chevron.
+   Scoped styles for layout, title breadcrumbs, connections pills,
+   icon triggers, and active drop-down panel menus overlays.
    ========================================================================== */
 
 .navbar-outer {
@@ -15,6 +14,7 @@
     border-bottom: 1px solid var(--color-border);
     flex-shrink: 0;
     width: 100%;
+    position: relative;
 }
 
 /* ── 1. LEFT SECTION ─────────────────────────────────────────────────────── */
@@ -88,6 +88,7 @@
     cursor: pointer;
     position: relative;
     transition: var(--transition-fast);
+    text-decoration: none;
 }
 
 .navbar-icon-btn:hover {
@@ -114,6 +115,7 @@
     border-left: 1px solid var(--color-border);
     cursor: pointer;
     transition: var(--transition-fast);
+    text-decoration: none;
 }
 
 .navbar-user-avatar {
@@ -145,4 +147,155 @@
 
 .navbar-user-profile:hover .navbar-user-chevron {
     color: var(--color-text-primary);
+}
+
+/* ── 3. SEARCH INPUT BAR ─────────────────────────────────────────────────── */
+.navbar-search-container {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-bg-app);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 2px 8px;
+    margin-right: var(--spacing-sm);
+}
+
+.navbar-search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 11px;
+    color: var(--color-text-primary);
+    width: 140px;
+    padding: 2px 4px;
+}
+
+/* ── 4. DROPDOWN MENUS PANELS OVERLAYS ───────────────────────────────────── */
+.navbar-dropdown-panel {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 999;
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+    animation: dropdown-fade-in 0.15s ease-out;
+}
+
+@keyframes dropdown-fade-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.notifications-dropdown {
+    width: 280px;
+}
+
+.dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    font-size: 10px;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 4px;
+}
+
+.mark-read-btn {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: 9px;
+}
+
+.mark-read-btn:hover {
+    text-decoration: underline;
+}
+
+.dropdown-body {
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-item {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-decoration: none;
+    color: inherit;
+    border-radius: var(--radius-sm);
+}
+
+.notification-item.unread {
+    background-color: var(--color-primary-light);
+}
+
+.notification-item:hover {
+    background-color: var(--color-bg-app);
+}
+
+.notification-text {
+    font-size: 11px;
+    color: var(--color-text-primary);
+    line-height: 1.3;
+}
+
+.notification-time {
+    font-size: 9px;
+    color: var(--color-text-muted);
+}
+
+.profile-dropdown-user {
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.profile-dropdown-name {
+    font-weight: var(--font-weight-bold);
+    font-size: 12px;
+    color: var(--color-text-primary);
+}
+
+.profile-dropdown-email {
+    font-size: 10px;
+    color: var(--color-text-secondary);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: var(--color-border);
+    margin: 4px 0;
+}
+
+.dropdown-item {
+    padding: 6px 10px;
+    font-size: 11px;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+}
+
+.dropdown-item:hover {
+    background-color: var(--color-bg-app);
+}
+
+.dropdown-item.logout-item {
+    color: #EF4444;
+}
+
+.dropdown-item.logout-item:hover {
+    background-color: rgba(239, 68, 68, 0.05);
 }

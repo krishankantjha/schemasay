@@ -39,6 +39,8 @@ def clear_session_state() -> None:
         KEY_TOKEN,
         KEY_REFRESH_TOKEN,
         KEY_ACTIVE_CONNECTION_ID,
+        "profile_verified",
+        "cached_profile_data",
     ]
     for key in keys_to_clear:
         st.session_state.pop(key, None)
