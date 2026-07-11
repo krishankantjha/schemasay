@@ -24,6 +24,7 @@ def init_session_state() -> None:
     """
     defaults = {
         KEY_ACTIVE_CONNECTION_ID: None,
+        "auth_mode": "login",
         "selected_sidebar_item": "dashboard",
         "prompt_text": "",
         "generated_sql": "",
@@ -64,6 +65,7 @@ def clear_session_state() -> None:
         KEY_TOKEN,
         KEY_REFRESH_TOKEN,
         KEY_ACTIVE_CONNECTION_ID,
+        "auth_mode",
         "profile_verified",
         "cached_profile_data",
         "selected_sidebar_item",
