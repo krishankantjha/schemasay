@@ -5,9 +5,7 @@ def show_auth_page():
     Displays the login and registration screen with a product pitch sidebar.
     Uses session state to delegate form rendering to subviews inside views/auth/.
     """
-    # Initialize session state for switching auth modes
-    if "auth_mode" not in st.session_state:
-        st.session_state["auth_mode"] = "login"
+    # auth_mode state key is initialized centrally in state.py
 
     # Centered Main Container Wrapper
     col_padding1, col_container, col_padding2 = st.columns([0.1, 9.8, 0.1])
