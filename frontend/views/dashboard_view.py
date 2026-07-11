@@ -47,83 +47,127 @@ def show_dashboard_view():
     # ── ROW 1: AI Copilot & SQL Workbench ─────────────────────────────────────
     row1_col1, row1_col2 = st.columns([1, 1.1])
     
-    # --- Column 1: AI Copilot ---
+    # --- Column 1: SchemaSay AI ---
     with row1_col1:
         with st.container(border=True, key="dash_ai_copilot_card"):
+            # Header Title, Icon & Tagline
             st.markdown(
                 """
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:16px;">🤖</span>
-                        <strong style="font-family:var(--font-display); font-size:14px; color:var(--color-text-primary);">AI Copilot</strong>
-                        <span style="font-size:11px; color:var(--color-text-secondary); margin-left:4px;">Ask anything about your data in plain English</span>
+                        <span class="copilot-icon">
+                            <svg viewBox="0 0 24 24" width="18" height="18" style="fill: none; stroke: var(--color-primary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: inline-block; vertical-align: middle;">
+                                <path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/>
+                            </svg>
+                        </span>
+                        <strong style="font-family:var(--font-display); font-size:14px; color:var(--color-text-primary);">SchemaSay AI</strong>
+                        <span style="font-size:11px; color:var(--color-text-secondary); margin-left:4px;">Ask anything about your data in natural language</span>
                     </div>
                 </div>
                 """,
                 unsafe_allow_html=True
             )
             
-            # Input Prompt
-            prompt_input = st.text_area(
-                "Prompt Input",
-                placeholder="e.g. Find total sales per month...",
-                height=52,
-                key="dash_prompt_input_text",
-                label_visibility="collapsed"
+            # Suggestion Chips list
+            st.markdown(
+                """
+                <div class="suggestion-chips-container" style="margin-bottom: 8px;">
+                    <a href="?prompt=Show+total+sales+per+month+for+the+last+year" class="suggestion-chip" target="_self">Show total sales per month for the last year</a>
+                </div>
+                """,
+                unsafe_allow_html=True
             )
             
-            # Generate button trigger
-            col_gen, col_empty = st.columns([1.2, 2.5])
-            with col_gen:
-                if st.button("Generate SQL ⚡", type="primary", key="dash_gen_sql_btn", use_container_width=True):
-                    if not active_conn_id:
-                        st.error("No active connection. Please configure a connection first under Connections.")
-                    elif not prompt_input.strip():
-                        st.error("Please enter a prompt first.")
-                    else:
-                        with st.spinner("Translating prompt to SQL..."):
-                            try:
-                                response = api_client.query_assistant(token, active_conn_id, prompt_input)
-                                if response.status_code == 200:
-                                    res_data = response.json()
-                                    sql = res_data.get("sql", "")
-                                    st.session_state["dash_generated_sql"] = sql
-                                    
-                                    # Fetch results
-                                    rows = res_data.get("rows", [])
-                                    st.session_state["dash_execution_rows"] = rows
-                                    
-                                    # Generate AI insights dynamically
-                                    if rows:
-                                        ins_payload = {
-                                            "rows": rows,
-                                            "columns": list(rows[0].keys()) if rows else [],
-                                            "question": prompt_input
-                                        }
-                                        ins_res = api_client.generate_insight(token, ins_payload)
-                                        if ins_res.status_code == 200:
-                                            st.session_state["dash_insights"] = ins_res.json().get("insights", [])
-                                    
-                                    st.success("Query generated and executed successfully!")
-                                    st.rerun()
-                                else:
-                                    st.error(f"Error ({response.status_code}): {response.text[:200]}")
-                            except Exception as e:
-                                st.error(f"Assistant connection failed: {str(e)}")
+            # Inline prompt input text and trigger button
+            if "dash_prompt_input_text_val" not in st.session_state:
+                st.session_state["dash_prompt_input_text_val"] = ""
+                
+            # Intercept chip trigger
+            chip_prompt = st.query_params.get("prompt")
+            if chip_prompt:
+                st.session_state["dash_prompt_input_text_val"] = chip_prompt
+                st.query_params.pop("prompt", None)
+                st.rerun()
+
+            col_input, col_action = st.columns([3.3, 1.5])
+            with col_input:
+                prompt_input = st.text_input(
+                    "Prompt Input",
+                    value=st.session_state["dash_prompt_input_text_val"],
+                    placeholder="Show total sales per month for the last year",
+                    key="dash_prompt_input_text_widget",
+                    label_visibility="collapsed"
+                )
+                st.session_state["dash_prompt_input_text_val"] = prompt_input
+                
+            with col_action:
+                generate_clicked = st.button("Generate SQL ⚡", type="primary", key="dash_gen_sql_btn", use_container_width=True)
+                
+            if generate_clicked:
+                if not active_conn_id:
+                    st.error("No active connection. Please configure a connection first under Connections.")
+                elif not prompt_input.strip():
+                    st.error("Please enter a prompt first.")
+                else:
+                    with st.spinner("Translating prompt to SQL..."):
+                        try:
+                            response = api_client.query_assistant(token, active_conn_id, prompt_input)
+                            if response.status_code == 200:
+                                res_data = response.json()
+                                sql = res_data.get("sql", "")
+                                st.session_state["dash_generated_sql"] = sql
                                 
-            # SQL Preview Box
+                                # Fetch results
+                                rows = res_data.get("rows", [])
+                                st.session_state["dash_execution_rows"] = rows
+                                
+                                # Generate AI insights dynamically
+                                if rows:
+                                    ins_payload = {
+                                        "rows": rows,
+                                        "columns": list(rows[0].keys()) if rows else [],
+                                        "question": prompt_input
+                                    }
+                                    ins_res = api_client.generate_insight(token, ins_payload)
+                                    if ins_res.status_code == 200:
+                                        st.session_state["dash_insights"] = ins_res.json().get("insights", [])
+                                
+                                st.success("Query generated and executed successfully!")
+                                st.rerun()
+                            else:
+                                st.error(f"Error ({response.status_code}): {response.text[:200]}")
+                        except Exception as e:
+                            st.error(f"Assistant connection failed: {str(e)}")
+                                
+            # High-Fidelity Code block with line numbers & copy button inside the preview container
             sql_code = st.session_state["dash_generated_sql"]
+            
+            # Split the SQL code by lines to generate a clean table with line numbers
+            lines = sql_code.split('\n')
+            code_lines_html = ""
+            for i in range(1, len(lines) + 1):
+                code_lines_html += f"<div>{i}</div>"
+                
+            # Safely escape SQL string for javascript backticks
+            js_escaped_sql = sql_code.replace("`", "\\`").replace("$", "\\$")
+                
             st.markdown(
                 f"""
-                <div class="sql-preview-container" style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:10px; margin-top:10px;">
-                    <div class="sql-preview-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <span class="sql-preview-label" style="font-size:9px; font-weight:700; color:#64748B; text-transform:uppercase;">Generated SQL code</span>
+                <div class="sql-preview-container" style="flex-grow: 1; display: flex; flex-direction: column;">
+                    <div class="sql-preview-header">
+                        <span class="sql-preview-label">Generated SQL Code</span>
+                        <span onclick="navigator.clipboard.writeText(`{js_escaped_sql}`); alert('SQL copied to clipboard!');" class="sql-preview-copy-btn" style="cursor: pointer; user-select: none;">Copy SQL</span>
+                    </div>
+                    <div style="display:flex; font-family:var(--font-mono); font-size:11px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; overflow:hidden; line-height:1.5;">
+                        <div style="background:#F1F5F9; color:#94A3B8; padding:10px 8px; text-align:right; border-right:1px solid #E2E8F0; user-select:none; min-width:30px;">
+                            {code_lines_html}
+                        </div>
+                        <pre class="sql-preview-code" style="margin:0; padding:10px 12px; color:#0F172A; white-space:pre-wrap; word-break:break-all; flex-grow:1; overflow-y:auto; max-height:120px; text-align: left;"><code id="generated-sql-code">{sql_code}</code></pre>
                     </div>
                 </div>
                 """,
                 unsafe_allow_html=True
             )
-            st.code(sql_code, language="sql")
 
     # --- Column 2: SQL Workbench ---
     with row1_col2:
