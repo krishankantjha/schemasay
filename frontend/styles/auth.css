@@ -265,3 +265,140 @@ div[data-testid="block-container"] {
     font-size: 32px;
     margin: 0 auto 20px;
 }
+
+/* Text Input controls overrides */
+div[data-testid="stTextInput"] label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #111827 !important;
+    margin-bottom: 8px !important;
+}
+div[data-testid="stTextInput"] input {
+    height: 52px !important;
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
+    border: 1.5px solid #D9E3F5 !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    outline: none !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+}
+div[data-testid="stTextInput"] input:focus {
+    border-color: #4169E1 !important;
+    box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.15) !important;
+}
+
+/* Force placeholder text to be visible and high-contrast in white inputs */
+div[data-testid="stTextInput"] input::placeholder {
+    color: #64748B !important;
+    opacity: 1 !important;
+}
+div[data-testid="stTextInput"] input::-webkit-input-placeholder {
+    color: #64748B !important;
+    opacity: 1 !important;
+}
+div[data-testid="stTextInput"] input::-moz-placeholder {
+    color: #64748B !important;
+    opacity: 1 !important;
+}
+div[data-testid="stTextInput"] input:-ms-input-placeholder {
+    color: #64748B !important;
+    opacity: 1 !important;
+}
+
+/* Inject background envelope icon in Email inputs */
+div[data-testid="stTextInput"]:has(input[placeholder*="email"]) input {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236B7280"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: 16px center !important;
+    background-size: 20px 20px !important;
+    padding-left: 48px !important;
+}
+
+/* Inject background user profile icon in Full Name inputs */
+div[data-testid="stTextInput"]:has(input[placeholder*="name"]) input {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236B7280"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: 16px center !important;
+    background-size: 20px 20px !important;
+    padding-left: 48px !important;
+}
+
+/* Inject background lock icon in Password inputs */
+div[data-testid="stTextInput"]:has(input[type="password"]) input {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236B7280"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6-5c1.66 0 3 1.34 3 3v2H9V6c0-1.66 1.34-3 3-3z"/></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: 16px center !important;
+    background-size: 20px 20px !important;
+    padding-left: 48px !important;
+}
+
+/* Style the Login / Submit button */
+div[data-testid="stButton"] button[kind="primary"] {
+    height: 54px !important;
+    background-color: #4169E1 !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 6px rgba(65, 105, 225, 0.2) !important;
+    transition: all 0.2s ease-in-out !important;
+    width: 100% !important;
+}
+div[data-testid="stButton"] button[kind="primary"]:hover {
+    background-color: #2F5DD7 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 12px rgba(65, 105, 225, 0.3) !important;
+}
+
+/* Style the Toggle Auth state buttons to look like clean blue text links */
+.st-key-signup_row_container, .st-key-signin_row_container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-top: 15px !important;
+    background: transparent !important;
+}
+.st-key-signup_row_container div[data-testid="column"],
+.st-key-signin_row_container div[data-testid="column"] {
+    width: auto !important;
+    flex: none !important;
+    padding: 0 !important;
+}
+/* Direct widget-key selectors for absolute styling control */
+.st-key-toggle_to_signup button,
+.st-key-toggle_to_login button,
+div[class*="toggle_to_signup"] button,
+div[class*="toggle_to_login"] button {
+    background-color: transparent !important;
+    border: none !important;
+    color: #4169E1 !important;
+    box-shadow: none !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-align: left !important;
+    padding: 0 0 0 4px !important;
+    height: 32px !important;
+    line-height: 32px !important;
+}
+.st-key-toggle_to_signup button:hover,
+.st-key-toggle_to_login button:hover,
+div[class*="toggle_to_signup"] button:hover,
+div[class*="toggle_to_login"] button:hover {
+    color: #2F5DD7 !important;
+    text-decoration: underline !important;
+    background-color: transparent !important;
+}
+
+/* Force text input container divs (like suffix/eye icon wrapper) to be transparent */
+div[data-testid="stTextInput"] div {
+    background-color: transparent !important;
+}
+div[data-testid="stTextInput"] button {
+    background-color: transparent !important;
+    border: none !important;
+}
+div[data-testid="stTextInput"] button svg {
+    fill: #64748B !important;
+}
