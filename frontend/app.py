@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 from api_client import api_client
 from views.auth_view import show_auth_page
