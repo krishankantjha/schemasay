@@ -1,15 +1,3 @@
-"""
-SchemaSay Frontend — Application Entrypoint
-
-Responsibilities:
-  1. Configure Streamlit page settings.
-  2. Load global CSS design system.
-  3. Initialize session state.
-  4. Gate unauthenticated users to the auth page.
-  5. Verify tokens with the backend and handle refresh/expiry.
-  6. Render the appropriate page for authenticated users.
-"""
-
 import os
 import streamlit as st
 from api_client import api_client
@@ -52,6 +40,7 @@ token = st.session_state[KEY_TOKEN]
 # Cache profile data to avoid backend spamming on every rerun/click
 verified = st.session_state.get("profile_verified", False)
 cached_user_data = st.session_state.get("cached_profile_data", None)
+status_code = None
 
 if not verified or cached_user_data is None:
     with st.spinner("Verifying session..."):
@@ -62,26 +51,8 @@ if not verified or cached_user_data is None:
         st.session_state.profile_verified = True
         st.session_state.cached_profile_data = cached_user_data
         status_code = 200
-    elif response.status_code == 401 and KEY_REFRESH_TOKEN in st.session_state:
-        # Access token expired — attempt silent refresh
-        with st.spinner("Session expired. Renewing..."):
-            refresh_res = api_client.refresh(st.session_state[KEY_REFRESH_TOKEN])
-        
-        if refresh_res.status_code == 200:
-            res_data = refresh_res.json()
-            st.session_state[KEY_TOKEN] = res_data["access_token"]
-            st.session_state[KEY_REFRESH_TOKEN] = res_data["refresh_token"]
-            st.rerun()
-        else:
-            st.session_state.pop(KEY_TOKEN, None)
-            st.session_state.pop(KEY_REFRESH_TOKEN, None)
-            st.error("Your session has expired. Please log in again.")
-            st.rerun()
     else:
-        st.session_state.pop(KEY_TOKEN, None)
-        st.session_state.pop(KEY_REFRESH_TOKEN, None)
-        st.error("Authentication failed. Please log in again.")
-        st.rerun()
+        status_code = response.status_code
 else:
     status_code = 200
 
@@ -217,7 +188,6 @@ if status_code == 200:
 
     from components.sidebar import render_sidebar
     from components.navbar import render_navbar
-    from components.schemasay_ai import render_ai_copilot_panel
     
     active_tip = st.session_state.get("current_tip_index", 0)
     sidebar_content = render_sidebar(active_tip).replace("\n", "")
@@ -245,54 +215,12 @@ if status_code == 200:
             '</div>',
             unsafe_allow_html=True
         )
-    
-    # ── 3. Render Main Grid Canvas ───────────────────────────────────────────
-    st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
-    
-    # Row 1: SchemaSay AI & SQL Workbench
-    row1_col1, row1_col2 = st.columns([1, 1.1])
-    with row1_col1:
-        with st.container(border=True):
-            st.markdown('<div class="card-height-r1"></div>', unsafe_allow_html=True)
-            render_ai_copilot_panel()
-            
-    with row1_col2:
-        with st.container(border=True):
-            st.markdown('<div class="card-height-r1"></div>', unsafe_allow_html=True)
-            # SQL Workbench (Empty for Phase 5)
-            pass
-            
-    # Row 2: Schema Explorer, Center panel, Right feeds
-    row2_col1, row2_col2, row2_col3 = st.columns([1.2, 3.2, 1.3])
-    with row2_col1:
-        with st.container(border=True):
-            st.markdown('<div class="card-height-r2"></div>', unsafe_allow_html=True)
-            # Schema Explorer (Empty for Phase 5)
-            pass
-            
-    with row2_col2:
-        with st.container(border=True):
-            st.markdown('<div class="card-height-r2"></div>', unsafe_allow_html=True)
-            # Center Panel (Empty for Phase 5)
-            pass
-            
-    with row2_col3:
-        with st.container(border=True):
-            st.markdown('<div class="card-height-r2"></div>', unsafe_allow_html=True)
-            # Right Feeds (Empty for Phase 5)
-            pass
-            
-    # Row 3: Full Width
-    with st.container(border=True):
-        st.markdown('<div class="card-height-r3"></div>', unsafe_allow_html=True)
-        # Footer card (Empty for Phase 5)
-        pass
-        
-    # ── 5. Close Layout Containers ────────────────────────────────────────────
+
+elif status_code == 401 and KEY_REFRESH_TOKEN in st.session_state:
     # Access token expired — attempt silent refresh
     with st.spinner("Session expired. Renewing..."):
         refresh_res = api_client.refresh(st.session_state[KEY_REFRESH_TOKEN])
-
+ 
     if refresh_res.status_code == 200:
         res_data = refresh_res.json()
         st.session_state[KEY_TOKEN] = res_data["access_token"]
