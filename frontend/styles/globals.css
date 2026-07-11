@@ -85,9 +85,23 @@
     padding: 0;
 }
 
-/* Hide standard Streamlit header, footer toolbar and MainMenu */
-#MainMenu, footer, header, [data-testid="stHeader"], [data-testid="stToolbar"] {
+/* Hide standard Streamlit footer, toolbar and MainMenu */
+#MainMenu, footer, [data-testid="stToolbar"] {
     display: none !important;
+}
+
+/* Make stHeader transparent to keep the sidebar expand/collapse button visible and functional */
+[data-testid="stHeader"], header {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: transparent !important;
+}
+
+[data-testid="stHeader"] button, header button {
+    color: var(--color-text-primary) !important;
+    background-color: transparent !important;
 }
 
 /* Set core app viewport backgrounds and layout limits */
@@ -135,6 +149,9 @@ div[data-testid="stVerticalBlock"] > div[data-testid="element-container"]:last-c
 section[data-testid="stSidebar"] {
     background-color: var(--color-bg-sidebar) !important;
     border-right: 1px solid var(--color-border-subtle) !important;
+}
+
+section[data-testid="stSidebar"][data-collapsed="false"] {
     width: 260px !important;
 }
 
