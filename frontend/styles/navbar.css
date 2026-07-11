@@ -13,8 +13,61 @@
     background-color: var(--color-bg-sidebar);
     border-bottom: 1px solid var(--color-border-subtle);
     flex-shrink: 0;
-    width: 100%;
-    position: relative;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99999;
+}
+
+/* Logo / Branding in Navbar */
+.navbar-brand-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 212px; /* aligns divider with 260px sidebar */
+    flex-shrink: 0;
+}
+
+.navbar-logo-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    text-decoration: none;
+}
+
+.navbar-logo-text {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-inverse);
+    letter-spacing: -0.03em;
+}
+
+.navbar-logo-accent {
+    color: #60A5FA;
+}
+
+.navbar-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.navbar-menu-toggle:hover {
+    color: var(--color-text-inverse);
+}
+
+.navbar-divider-vertical {
+    width: 1px;
+    height: 24px;
+    background-color: var(--color-border-subtle);
+    margin-left: var(--spacing-xl);
+    margin-right: var(--spacing-lg);
+    flex-shrink: 0;
 }
 
 /* ── 1. LEFT SECTION ─────────────────────────────────────────────────────── */

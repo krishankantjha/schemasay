@@ -8,7 +8,7 @@ Now fully interactive, supporting notifications lists, profile dropdowns, and th
 
 import streamlit as st
 from services.notification_service import get_notifications, get_unread_count
-from components.icons import SEARCH_SVG, BELL_SVG, MOON_SVG, SUN_SVG, CHEVRON_SVG
+from components.icons import SEARCH_SVG, BELL_SVG, MOON_SVG, SUN_SVG, CHEVRON_SVG, LOGO_SVG, HAMBURGER_SVG
 
 def render_navbar(title: str = "Dashboard", display_name: str = "John Doe", initials: str = "JD") -> str:
     """
@@ -83,8 +83,16 @@ def render_navbar(title: str = "Dashboard", display_name: str = "John Doe", init
 
     navbar_html = f"""
     <div class="navbar-outer">
-        <!-- Left Section: Title & Connection Badge -->
+        <!-- Left Section: Branding Logo, Title & Connection Badge -->
         <div class="navbar-left">
+            <div class="navbar-brand-group">
+                <a href="?action=nav_dashboard" class="navbar-logo-brand" target="_self">
+                    {LOGO_SVG}
+                    <span class="navbar-logo-text">Schema<span class="navbar-logo-accent">Say</span></span>
+                </a>
+                <a href="?action=toggle_sidebar" class="navbar-menu-toggle" target="_self" style="text-decoration:none;">{HAMBURGER_SVG}</a>
+            </div>
+            <div class="navbar-divider-vertical"></div>
             <div class="navbar-title-group">
                 <span class="navbar-title">{title}</span>
                 <span class="navbar-breadcrumb">Home / {title}</span>

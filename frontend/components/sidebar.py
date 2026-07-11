@@ -34,12 +34,10 @@ def render_sidebar(active_tip: int = 0) -> str:
     active_page = st.session_state.get("selected_sidebar_item", "dashboard")
 
     from components.icons import (
-        LOGO_SVG, HAMBURGER_SVG, DASHBOARD_SVG, CONNECTIONS_SVG, UPLOAD_SVG,
+        DASHBOARD_SVG, CONNECTIONS_SVG, UPLOAD_SVG,
         SCHEMA_SVG, COPILOT_SVG, WORKBENCH_SVG, HISTORY_SVG, VISUALIZATIONS_SVG,
         RESULTS_SVG, INSIGHTS_SVG, SETTINGS_SVG, HELP_SVG, LOGOUT_SVG, LIGHTBULB_SVG
     )
-    logo_svg = LOGO_SVG
-    hamburger_svg = HAMBURGER_SVG
     dashboard_svg = DASHBOARD_SVG
     connections_svg = CONNECTIONS_SVG
     upload_svg = UPLOAD_SVG
@@ -71,15 +69,6 @@ def render_sidebar(active_tip: int = 0) -> str:
 
     sidebar_html = f"""
     <div class="sidebar-inner {collapsed_class}">
-        <!-- Logo Section -->
-        <div class="sidebar-logo-container">
-            <a href="?action=nav_dashboard" class="sidebar-logo-brand" target="_self">
-                {logo_svg}
-                <span class="sidebar-logo-text">Schema<span class="sidebar-logo-accent">Say</span></span>
-            </a>
-            <a href="?action=toggle_sidebar" class="sidebar-menu-toggle" target="_self" style="text-decoration:none;">{hamburger_svg}</a>
-        </div>
-
         <!-- Primary Navigation Menu -->
         <ul class="sidebar-menu-list">
             <li>

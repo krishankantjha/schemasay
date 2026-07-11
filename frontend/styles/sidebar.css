@@ -14,55 +14,7 @@
     overflow: hidden;
 }
 
-/* ── 1. LOGO SECTION ────────────────────────────────────────────────────── */
-.sidebar-logo-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--spacing-lg);
-    padding: 0 4px;
-    flex-shrink: 0;
-}
-
-.sidebar-logo-brand {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    text-decoration: none;
-}
-
-.sidebar-logo-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-primary);
-    flex-shrink: 0;
-}
-
-.sidebar-logo-text {
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-inverse);
-    letter-spacing: -0.03em;
-}
-
-.sidebar-logo-accent {
-    color: #60A5FA;
-}
-
-.sidebar-menu-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-text-muted);
-    cursor: pointer;
-    transition: var(--transition-fast);
-}
-
-.sidebar-menu-toggle:hover {
-    color: var(--color-text-inverse);
-}
+/* ── 1. LOGO SECTION REMOVED (MOVED TO NAVBAR) ───────────────────────────── */
 
 /* ── 2. NAVIGATION LISTS ─────────────────────────────────────────────────── */
 .sidebar-menu-list {

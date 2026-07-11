@@ -121,9 +121,10 @@ section[data-testid="stMain"] > div:first-child {
     padding-top: 0 !important;
 }
 
-/* Eliminate padding on main block container to stretch navbar full width */
+/* Eliminate padding on main block container to stretch navbar full width, and add top padding for fixed header */
 div[data-testid="block-container"] {
     padding: 0 !important;
+    padding-top: 56px !important;
     max-width: 100% !important;
     height: 100vh !important;
     display: flex !important;
@@ -149,6 +150,7 @@ div[data-testid="stVerticalBlock"] > div[data-testid="element-container"]:last-c
 section[data-testid="stSidebar"] {
     background-color: var(--color-bg-sidebar) !important;
     border-right: 1px solid var(--color-border-subtle) !important;
+    padding-top: 56px !important;
 }
 
 section[data-testid="stSidebar"][data-collapsed="false"] {
