@@ -233,3 +233,33 @@ code, pre {
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(100, 116, 139, 0.4);
 }
+
+/* ── 7. NATIVE ELEMENT TEXT CONTRAST OVERRIDES ────────────────────────────── */
+/* Target default markdown paragraph/span texts in main content body */
+div[data-testid="stMain"] div[data-testid="stMarkdownContainer"] p, 
+div[data-testid="stMain"] div[data-testid="stMarkdownContainer"] span {
+    color: var(--color-text-secondary) !important;
+}
+
+/* Force heading colors */
+div[data-testid="stMain"] h1, 
+div[data-testid="stMain"] h2, 
+div[data-testid="stMain"] h3, 
+div[data-testid="stMain"] h4, 
+div[data-testid="stMain"] h5, 
+div[data-testid="stMain"] h6 {
+    color: var(--color-text-primary) !important;
+}
+
+/* Target st.metric labels and values */
+div[data-testid="stMetricLabel"] div,
+div[data-testid="stMetricLabel"] p,
+div[data-testid="stMetricLabel"] span {
+    color: var(--color-text-secondary) !important;
+}
+
+div[data-testid="stMetricValue"] div,
+div[data-testid="stMetricValue"] {
+    color: var(--color-text-primary) !important;
+    font-weight: var(--font-weight-bold) !important;
+}
