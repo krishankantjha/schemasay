@@ -117,12 +117,12 @@
 
 /* ── 4. LOGOUT ACTION ────────────────────────────────────────────────────── */
 .logout-item {
-    color: #EF4444; 
+    color: var(--color-danger); 
 }
 
 .logout-item:hover {
-    background-color: rgba(239, 68, 68, 0.08) !important;
-    color: #EF4444 !important;
+    background-color: var(--color-danger-bg) !important;
+    color: var(--color-danger) !important;
 }
 
 /* ── 5. QUICK TIP CARD ───────────────────────────────────────────────────── */
@@ -147,7 +147,7 @@
 .quick-tip-icon {
     display: flex;
     align-items: center;
-    color: #F59E0B; 
+    color: var(--color-warning); 
 }
 
 .quick-tip-title {
