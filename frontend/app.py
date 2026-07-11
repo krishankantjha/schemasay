@@ -27,6 +27,9 @@ init_session_state()
 
 # ── Auth Gate ─────────────────────────────────────────────────────────────────
 if KEY_TOKEN not in st.session_state:
+    # Clear query parameters on auth screen to prevent action loop redirects
+    if st.query_params:
+        st.query_params.clear()
     # Not logged in — show auth page (loads auth.css internally)
     _load_css("auth.css")
     show_auth_page()
