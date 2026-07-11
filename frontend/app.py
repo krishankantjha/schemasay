@@ -257,7 +257,6 @@ if status_code == 200:
         # Render the AI Copilot UI
         from components.schemasay_ai import render_ai_copilot_panel
         st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
-        # Double-container layout with empty slots matching visual mockup
         row1_col1, row1_col2 = st.columns([1, 1.1])
         with row1_col1:
             with st.container(border=True):
@@ -266,8 +265,14 @@ if status_code == 200:
         with row1_col2:
             with st.container(border=True):
                 st.markdown('<div class="card-height-r1"></div>', unsafe_allow_html=True)
-                st.write("#### SQL Workbench")
-                st.info("Select a query or type SQL directly to run execution plans.")
+                st.write("#### SQL Workbench Preview")
+                st.info("Directly write SQL or inspect generated schemas. Head to the SQL Workbench in the sidebar for full editor capabilities.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif active_nav_id == "dashboard":
+        from views.dashboard_view import show_dashboard_view
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        show_dashboard_view()
         st.markdown('</div>', unsafe_allow_html=True)
 
     elif active_nav_id == "connections":
@@ -275,12 +280,59 @@ if status_code == 200:
         st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
         show_connection_manager()
         st.markdown('</div>', unsafe_allow_html=True)
-        
-    elif active_nav_id != "dashboard":
-        # Default placeholder views for other items
+
+    elif active_nav_id == "upload":
+        from views.upload_view import show_upload_view
         st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
-        st.write(f"### {page_title}")
-        st.info(f"The {page_title} dashboard module is loaded successfully.")
+        show_upload_view()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif active_nav_id == "schema":
+        from views.schema_view import show_schema_view
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        show_schema_view()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif active_nav_id == "workbench":
+        from views.workbench_view import show_workbench_view
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        show_workbench_view()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif active_nav_id == "history":
+        from views.history_view import show_history_view
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        show_history_view()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif active_nav_id == "visualizations":
+        from views.visualizations_view import show_visualizations_view
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        show_visualizations_view()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif active_nav_id == "results":
+        from views.results_view import show_results_view
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        show_results_view()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif active_nav_id == "insights":
+        from views.insights_view import show_insights_view
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        show_insights_view()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif active_nav_id == "settings":
+        from views.settings_view import show_settings_view
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        show_settings_view()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    elif active_nav_id == "help":
+        from views.help_view import show_help_view
+        st.markdown('<div class="dashboard-container">', unsafe_allow_html=True)
+        show_help_view()
         st.markdown('</div>', unsafe_allow_html=True)
     
     # ── 2. Render Confirm Logout Dialogue Modal ──────────────────────────────
